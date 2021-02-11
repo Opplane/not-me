@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "build:release": "tsc --project tsconfig.release.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -17,6 +18,7 @@
   },
   "author": "Opplane",
   "license": "ISC",
+  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "jest": "^26.6.3",
@@ -41,13 +43,12 @@
     "globals": {
       "ts-jest": {
         "isolatedModules": true,
-        "tsconfig": "tsconfig.test.json"
+        "tsconfig": "tsconfig.json"
       }
     },
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/src/",
-      "<rootDir>/libs/"
+      "<rootDir>/src/"
     ],
     "moduleDirectories": [
       "node_modules",
