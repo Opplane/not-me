@@ -2,9 +2,10 @@
   "name": "u-knot-me",
   "version": "1.0.0",
   "description": "Easy and type-safe validation",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "build:watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
