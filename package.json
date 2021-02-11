@@ -4,11 +4,56 @@
   "description": "Easy and type-safe validation",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:cov:changed": "npm run test:cov -- --onlyChanged",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:debug:watch": "npm run test:debug -- --watch",
+    "format": "prettier --write \"**/*.{js,jsx,json,ts,tsx,scss,sass,css,md}\"",
+    "precommit": "lint-staged && npm run build"
   },
   "author": "Opplane",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.1",
     "typescript": "^4.1.5"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": ".",
+    "testMatch": [
+      "**/*.spec.ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "isolatedModules": true,
+        "tsconfig": "tsconfig.test.json"
+      }
+    },
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src/",
+      "<rootDir>/libs/"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,json,ts,tsx,scss,sass,css,md}": "prettier --write"
   }
 }
