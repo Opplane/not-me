@@ -1,4 +1,6 @@
-type ArrayFieldValidationError<T> = Array<InvalidFieldMessagesTree<T>>;
+type ArrayFieldValidationError<T> = {
+  [key: number]: InvalidFieldMessagesTree<T> | undefined;
+};
 
 type ObjectFieldValidationError<T extends { [key: string]: unknown }> = {
   [K in keyof T]: InvalidFieldMessagesTree<T[K]> | undefined;

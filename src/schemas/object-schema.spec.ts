@@ -8,11 +8,31 @@ describe("Object Schema", () => {
 
     const result = schema.validateSync({});
 
-    if (result.invalid) {
-    } else {
-      const b = result.value;
-    }
+    expect(result).toEqual({ invalid: false, value: {} });
+  });
 
-    expect(result).toEqual({ a: {} });
+  it("Should fail with non-object input", () => {
+    const schema = object({
+      a: object({ b: object({}) }),
+    });
+
+    const result = schema.validateSync({ a: 2 });
+
+    expect(result).toEqual({
+      invalid: true,
+      messagesTree: {
+        a: expect.any(String),
+      },
+    });
+  });
+
+  it("Should fail with non-defined object input", () => {
+    const schema = object({
+      a: object({ b: object({}) }).defined(),
+    });
+
+    const result = schema.validateSync({});
+
+    expect(result).toEqual({ invalid: true, messagesTree: { a: expect.any(String) } });
   });
 });

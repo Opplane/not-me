@@ -10,6 +10,10 @@ class DefaultMessagesManagerImpl {
   getDefaultMessages() {
     return this.defaultMessages;
   }
+
+  resetDefaultMessages() {
+    this.defaultMessages = undefined
+  }
 }
 
 export const DefaultMessagesManager = new DefaultMessagesManagerImpl();
