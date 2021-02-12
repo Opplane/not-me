@@ -1,4 +1,5 @@
-import { object, ObjectSchema } from "./object-schema";
+import { object } from "./object-schema";
+import { FilterResult } from "./schema";
 
 describe("Object Schema", () => {
   it("Should accept the object input", () => {
@@ -33,6 +34,26 @@ describe("Object Schema", () => {
 
     const result = schema.validateSync({});
 
-    expect(result).toEqual({ invalid: true, messagesTree: { a: expect.any(String) } });
+    expect(result).toEqual({
+      invalid: true,
+      messagesTree: { a: expect.any(String) },
+    });
+  });
+
+  it("Should accept the object when added new fields after the original schema creation", () => {
+    const schema = object({
+      a: object({ b: object({}) }),
+    })
+      .addFields({ c: object({}).defined() })
+      .defined();
+
+    const result: FilterResult<{ a?: { b?: {} }, c: {} }> = schema.validateSync({
+      c: {}
+    });
+
+    expect(result).toEqual({
+      invalid: false,
+      value: { c: {} },
+    });
   });
 });
