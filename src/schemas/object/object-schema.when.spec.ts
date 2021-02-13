@@ -1,45 +1,51 @@
-import { FilterResult, Schema } from "../schema"
+import { equals } from "../equals/equals-schema"
 import { object } from "./object-schema"
 
 describe('Object Schema - When', () => {
   it('Should accept object values with fields that are decided dynamically', () => {
     const schema = object({
-      a: object({})
+      common: equals([new Date()]),
+      a: equals(['a', 'b'] as const)
     })
       .union((v) => { 
-        if(v.a === undefined) {
+        if(v.a === 'a') {
           return {
-            c: object({}).defined()
+            a: equals(['a'] as const),
+            c: equals([0])
           }
         } else {
           return {
-            d: object({}).defined()
+            a: equals(['b'] as const),
+            d: equals([false])
           }
         }
       })
 
     const result = schema.validate({ c: {} })
 
-    if(result.invalid) {}
+    if(result.invalid) {
+      throw new Error()
+    }
     else {
-      const a: { a: undefined, c: {} } | { a: {}, d: {} } = result.value
+      const value: {common: Date,} & { a: 'a', c: number } | { a: 'b', d: boolean } = result.value
 
-      console.log(a)
+      expect(value).toEqual({
+        c: {}
+      })
     }
 
-    expect().toEqual({
-      invalid: false,
-      value: {
-        c: {}
-      }
-    })
+    const result2 = schema.validate({ a: {}, d: {} })
 
-    expect(schema.validate({ a: {}, d: {} })).toEqual({
-      invalid: false,
-      value: {
-        a: {},
-        d: {}
-      }
-    })
+    if(result2.invalid) {
+      throw new Error()
+    }
+    else {
+      const value: { a: 'a', c: number } | { a: 'b', d: boolean } = result.value
+
+      expect(value).toEqual({
+          a: {},
+          d: {}
+      })
+    }    
   })
 })

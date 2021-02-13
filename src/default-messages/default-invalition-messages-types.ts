@@ -5,5 +5,8 @@ export type DefaultInvalidationMessages = Partial<{
   base: Partial<{
     isNull: string;
     isUndefined: string;
+  }>,
+  equals: Partial<{
+    notEqual: string
   }>
 }>;

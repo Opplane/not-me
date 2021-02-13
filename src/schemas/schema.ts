@@ -3,7 +3,7 @@ import { InvalitionMessagesTree } from "src/default-messages/invalition-messages
 export type FilterResult<Output> =
   | {
       invalid: true;
-      messagesTree: InvalitionMessagesTree<Output>;
+      messagesTree: InvalitionMessagesTree;
     }
   | {
       invalid: false;
@@ -14,7 +14,7 @@ export type ValidationOptions = { abortEarly?: boolean } | undefined;
 
 export type Schema<Output> = {
   _outputType: Output;
-  validate(input: unknown, options: ValidationOptions): FilterResult<Output>
+  validate(input: unknown, options?: ValidationOptions): FilterResult<Output>
 }
 
 export type InferType<S extends { _outputType: unknown }> = S["_outputType"];

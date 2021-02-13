@@ -45,7 +45,7 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
   private isUndefinedMessage?: string;
 
   constructor(
-    typeFilterFn: TypeFilter<Type>['filterFn']
+    typeFilterFn: TypeFilter<Type>['filterFn'],
   ) {
     this.typeFilter = {
       type: FilterType.Type,
