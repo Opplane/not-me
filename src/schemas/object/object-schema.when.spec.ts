@@ -1,12 +1,12 @@
-import { InferType } from "src/types/infer-type"
+import { FilterResult, Schema } from "../schema"
 import { object } from "./object-schema"
 
 describe('Object Schema - When', () => {
   it('Should accept object values with fields that are decided dynamically', () => {
     const schema = object({
-      a: object({b: object({})})
+      a: object({})
     })
-      .when((v) => { 
+      .union((v) => { 
         if(v.a === undefined) {
           return {
             c: object({}).defined()
@@ -18,14 +18,23 @@ describe('Object Schema - When', () => {
         }
       })
 
-    expect(schema.validateSync({ c: {} })).toEqual({
+    const result = schema.validate({ c: {} })
+
+    if(result.invalid) {}
+    else {
+      const a: { a: undefined, c: {} } | { a: {}, d: {} } = result.value
+
+      console.log(a)
+    }
+
+    expect().toEqual({
       invalid: false,
       value: {
         c: {}
       }
     })
 
-    expect(schema.validateSync({ a: {}, d: {} })).toEqual({
+    expect(schema.validate({ a: {}, d: {} })).toEqual({
       invalid: false,
       value: {
         a: {},

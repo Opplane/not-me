@@ -1,4 +1,4 @@
-import { InvalitionMessagesTree } from "src/invalition-messages-tree";
+import { InvalitionMessagesTree } from "src/default-messages/invalition-messages-tree";
 
 export type FilterResult<Output> =
   | {

@@ -1,7 +1,9 @@
-export type DefaultMessages = Partial<{
+export type DefaultInvalidationMessages = Partial<{
   object: Partial<{
     notAnObject: string;
+  }>;
+  base: Partial<{
     isNull: string;
     isUndefined: string;
-  }>;
+  }>
 }>;

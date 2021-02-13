@@ -15,6 +15,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
     "esModuleInterop": true
   }
 }
