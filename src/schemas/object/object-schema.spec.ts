@@ -1,5 +1,5 @@
 import { object } from "./object-schema";
-import { FilterResult } from "./schema";
+import { FilterResult } from "../schema";
 
 describe("Object Schema", () => {
   it("Should accept the object input", () => {
@@ -7,7 +7,7 @@ describe("Object Schema", () => {
       a: object({ b: object({}) }),
     });
 
-    const result = schema.validateSync({});
+    const result = schema.validate({});
 
     expect(result).toEqual({ invalid: false, value: {} });
   });
@@ -17,7 +17,7 @@ describe("Object Schema", () => {
       a: object({ b: object({}) }),
     });
 
-    const result = schema.validateSync({ a: 2 });
+    const result = schema.validate({ a: 2 });
 
     expect(result).toEqual({
       invalid: true,
@@ -32,7 +32,7 @@ describe("Object Schema", () => {
       a: object({ b: object({}) }).defined(),
     });
 
-    const result = schema.validateSync({});
+    const result = schema.validate({});
 
     expect(result).toEqual({
       invalid: true,

@@ -1,27 +1,26 @@
-import { InferType } from "src/types/infer-type";
+import { InvalitionMessagesTree } from "src/invalition-messages-tree";
 import { throwError } from "src/utils/throw-error";
 import {
-  Schema,
-  FilterUnknownResult,
-  FilterResult,
-  ValidationOptions,
-} from "./schema";
+  BaseSchema, NullableTypes, DefaultNullableTypes,
+} from "./base-schema";
+import { FilterResult, InferType, Schema, ValidationOptions } from "./schema";
 
-type SchemaObjToObj<SchemasObj extends { [key: string]: Schema<any> | undefined }> = {
-  [K in keyof SchemasObj]: SchemasObj[K] extends Schema<any> ? InferType<SchemasObj[K]> : never;
+type SchemaObjToShape<SchemasObj extends { [key: string]: BaseSchema<any, any, any> | undefined }> = {
+  [K in keyof SchemasObj]: SchemasObj[K] extends BaseSchema<any, any, any> ? InferType<SchemasObj[K]> : never;
 };
 
+type SchemaType = { [key: string]: unknown }
+
 export class ObjectSchema<
-  CurrentSchemaObj extends { [key: string]: Schema<any> },
-  NullableTypes extends undefined | null = undefined
-> extends Schema<
-  | SchemaObjToObj<CurrentSchemaObj>
-  | NullableTypes
+  CurrentSchemaObj extends { [key: string]: BaseSchema<any, any, any> },
+  NT extends NullableTypes = DefaultNullableTypes
+> extends BaseSchema<
+  SchemaType,
+  SchemaObjToShape<CurrentSchemaObj>,
+  NT
 > {
   constructor(private schemaObj: CurrentSchemaObj) {
-    super();
-
-    this.filters.push((input: unknown, options) => {
+    super((input: unknown, options) => {
       if (typeof input !== "object") {
         return {
           invalid: true,
@@ -35,9 +34,9 @@ export class ObjectSchema<
       };
     });
 
-    this.filters.push((value: { [key: string]: unknown }, options) => {
+    this.addShapeFilter((value: SchemaType, options) => {
       return this.validateObj(schemaObj, value, options);
-    });
+    })
   }
 
   private validateObj<
@@ -46,16 +45,16 @@ export class ObjectSchema<
     }
   >(
     schemaObj: PartialSchemaObj,
-    value: { [key: string]: unknown },
+    value: SchemaType,
     options: ValidationOptions
-  ): FilterUnknownResult {
-    const finalValue: { [key: string]: unknown } = {};
+  ): FilterResult<{[key: string]: unknown}> {
+    const finalValue: SchemaType = {};
 
-    const invalidFieldsErrorMessages: { [key: string]: unknown } = {};
+    const invalidFieldsErrorMessages: InvalitionMessagesTree<SchemaType> = {};
 
     for (const fieldKey of Object.keys(schemaObj)) {
       const fieldSchema = schemaObj[fieldKey] || throwError();
-      const fieldResult = fieldSchema.validateSync(value[fieldKey], options);
+      const fieldResult = fieldSchema.validate(value[fieldKey], options);
 
       if (fieldResult.invalid) {
         if (options?.abortEarly) {
@@ -86,40 +85,32 @@ export class ObjectSchema<
     }
   }
 
-  nullable(): ObjectSchema<CurrentSchemaObj, Exclude<NullableTypes, null>> {
-    this.allowNull = true;
-    return this as unknown as ObjectSchema<CurrentSchemaObj, Exclude<NullableTypes, null>>;
+  public nullable(): ObjectSchema<CurrentSchemaObj, NT | null> {
+    return super.defined() as any
   }
 
-  defined(): ObjectSchema<CurrentSchemaObj, Exclude<NullableTypes, undefined>> {
-    this.allowUndefined = false;
-    return this as unknown as ObjectSchema<
-      CurrentSchemaObj,
-      Exclude<NullableTypes, undefined>
-    >;
+  public defined(): ObjectSchema<CurrentSchemaObj, Exclude<NT, undefined>> {
+    return super.defined() as any
   }
 
-  addFields<
-    AddedFieldsSchemasObj extends {
+  mergeFields<
+    MergedFieldsSchemaObj extends {
       [key: string]: Schema<any>;
     }
   >(
-    addedFieldsSchemaObj: AddedFieldsSchemasObj
-  ): ObjectSchema<CurrentSchemaObj & AddedFieldsSchemasObj, NullableTypes> {
+    addedFieldsSchemaObj: MergedFieldsSchemaObj
+  ): ObjectSchema<Omit<CurrentSchemaObj, keyof MergedFieldsSchemaObj> & MergedFieldsSchemaObj, NT> {
     this.schemaObj = {
       ...this.schemaObj,
       ...addedFieldsSchemaObj,
     };
 
-    return (this as unknown) as ObjectSchema<
-      CurrentSchemaObj & AddedFieldsSchemasObj,
-      NullableTypes
-    >;
+    return this as any
   }
 
   when<
     SchemaObjFactory extends (
-      value: SchemaObjToObj<CurrentSchemaObj>
+      value: SchemaObjToShape<CurrentSchemaObj>
     ) => { [key: string]: Schema<any> | undefined }
   >(
     schemaFactory: SchemaObjFactory
@@ -127,14 +118,14 @@ export class ObjectSchema<
     CurrentSchemaObj & ReturnType<SchemaObjFactory>,
     NullableTypes
   > {
-    this.filters.push((value: SchemaObjToObj<CurrentSchemaObj>, options) => {
+    this.valueFilters.push((value: SchemaObjToShape<CurrentSchemaObj>, options) => {
       const addedFieldsSchemaObj = schemaFactory(value);
 
       const result = this.validateObj(
         addedFieldsSchemaObj,
         value,
         options
-      ) as FilterResult<SchemaObjToObj<ReturnType<SchemaObjFactory>>>;
+      ) as FilterResult<SchemaObjToShape<ReturnType<SchemaObjFactory>>>;
 
       if (result.invalid) {
         return result;
@@ -157,7 +148,7 @@ export class ObjectSchema<
 }
 
 export function object<ObjectShape extends { [key: string]: unknown }>(
-  schemaObj: { [K in keyof ObjectShape]: Schema<ObjectShape[K]> }
-): ObjectSchema<{ [K in keyof ObjectShape]: Schema<ObjectShape[K]> }> {
+  schemaObj: { [K in keyof ObjectShape]: BaseSchema<ObjectShape[K]> }
+): ObjectSchema<{ [K in keyof ObjectShape]: BaseSchema<ObjectShape[K]> }> {
   return new ObjectSchema(schemaObj);
 }
