@@ -1,31 +1,40 @@
 import { DefaultInvalidationMessagesManager } from "src/default-messages/default-invalition-messages-manager";
 import { InvalitionMessagesTree } from "src/default-messages/invalition-messages-tree";
-import { DefaultNullableTypes, NullableTypes } from "src/utils/types/nullable-types";
 import {
-  BaseSchema
-} from "../base-schema";
+  DefaultNullableTypes,
+  NullableTypes,
+} from "src/utils/types/nullable-types";
+import { BaseSchema } from "../base-schema";
 import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
 
-type SchemaObjToShape<SchemasObj extends { [key: string]: Schema<any> | undefined }> = {
-  [K in keyof SchemasObj]: SchemasObj[K] extends Schema<any> ? InferType<SchemasObj[K]> : never;
+type SchemaObjToShape<
+  SchemasObj extends { [key: string]: Schema<any> | undefined }
+> = {
+  [K in keyof SchemasObj]: SchemasObj[K] extends Schema<any>
+    ? InferType<SchemasObj[K]>
+    : never;
 };
 
-type Type = { [key: string]: unknown }
+type Type = { [key: string]: unknown };
 
 export class ObjectSchema<
-  Shape extends {[key: string]: unknown},
+  Shape extends { [key: string]: unknown },
   NT extends NullableTypes = DefaultNullableTypes
-> extends BaseSchema<
-  Type,
-  Shape,
-  NT
-> {
-  constructor(schemaObj: {[K in keyof Shape]: Schema<Shape[K]>}, message?: string) {
+> extends BaseSchema<Type, Shape, NT> {
+  constructor(
+    schemaObj: { [K in keyof Shape]: Schema<Shape[K]> },
+    message?: string
+  ) {
     super((input, options) => {
       if (typeof input !== "object") {
         return {
           invalid: true,
-          messagesTree: [message || DefaultInvalidationMessagesManager.getDefaultMessages()?.object?.notAnObject ||"Input is not an object"],
+          messagesTree: [
+            message ||
+              DefaultInvalidationMessagesManager.getDefaultMessages()?.object
+                ?.notAnObject ||
+              "Input is not an object",
+          ],
         };
       }
 
@@ -37,7 +46,7 @@ export class ObjectSchema<
 
     this.addShapeFilter((value: Type, options) => {
       return this.validateObj(schemaObj, value, options);
-    })
+    });
   }
 
   private validateObj<
@@ -48,15 +57,17 @@ export class ObjectSchema<
     schemaObj: PartialSchemaObj,
     value: Type,
     options: ValidationOptions
-  ): FilterResult<{[key: string]: unknown}> {
+  ): FilterResult<{ [key: string]: unknown }> {
     const finalValue: Type = {};
 
-    const invalidFieldsErrorMessages: {[key: string]: InvalitionMessagesTree} = {};
+    const invalidFieldsErrorMessages: {
+      [key: string]: InvalitionMessagesTree;
+    } = {};
 
     for (const fieldKey of Object.keys(schemaObj)) {
       const fieldSchema = schemaObj[fieldKey];
 
-      if(fieldSchema === undefined) continue;
+      if (fieldSchema === undefined) continue;
 
       const fieldResult = fieldSchema.validate(value[fieldKey], options);
 
@@ -69,7 +80,9 @@ export class ObjectSchema<
             } as any,
           };
         } else {
-          invalidFieldsErrorMessages[fieldKey] = fieldResult.messagesTree as any;
+          invalidFieldsErrorMessages[
+            fieldKey
+          ] = fieldResult.messagesTree as any;
         }
       } else {
         finalValue[fieldKey] = fieldResult.value;
@@ -90,42 +103,48 @@ export class ObjectSchema<
   }
 
   public nullable(): ObjectSchema<Shape, NT | null> {
-    return super.defined() as any
+    return super.defined() as any;
   }
 
   public defined(): ObjectSchema<Shape, Exclude<NT, undefined>> {
-    return super.defined() as any
+    return super.defined() as any;
   }
 
   union<
-    SchemaFactory extends (value: Shape) => {[key: string]: Schema<unknown> | undefined }
+    SchemaFactory extends (
+      value: Shape
+    ) => { [key: string]: Schema<unknown> | undefined }
   >(
     schemaFactory: SchemaFactory
-  ): ObjectSchema<Omit<Shape, keyof SchemaObjToShape<ReturnType<SchemaFactory>>> & SchemaObjToShape<ReturnType<SchemaFactory>>, NT> {
+  ): ObjectSchema<
+    Omit<Shape, keyof SchemaObjToShape<ReturnType<SchemaFactory>>> &
+      SchemaObjToShape<ReturnType<SchemaFactory>>,
+    NT
+  > {
     this.addShapeFilter((input, options) => {
-      const schema = schemaFactory(input as Shape)
+      const schema = schemaFactory(input as Shape);
 
-      const result = this.validateObj(schema, input, options)
+      const result = this.validateObj(schema, input, options);
 
-      if(result.invalid) {
-        return result
+      if (result.invalid) {
+        return result;
       } else {
         return {
           invalid: false,
           value: {
             ...input,
-            ...result.value
-          }
-        }
+            ...result.value,
+          },
+        };
       }
-    })
+    });
 
-    return this as any
+    return this as any;
   }
 }
 
 export function object<Shape extends { [key: string]: unknown }>(
-  schemaObj: {[K in keyof Shape]: Schema<Shape[K]>}
+  schemaObj: { [K in keyof Shape]: Schema<Shape[K]> }
 ): ObjectSchema<Shape> {
   return new ObjectSchema(schemaObj);
 }

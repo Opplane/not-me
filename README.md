@@ -5,16 +5,18 @@
 ## Features:
 
 - Planned out to be used and shared **between backend and frontend**
-- **Powerful type inference**: no need to write types manually. Even *Discriminated Union types* are guessed from your schemas.
-  * Example of a *Discriminated Union Type*:
+- **Powerful type inference**: no need to write types manually. Even _Discriminated Union types_ are guessed from your schemas.
+  - Example of a _Discriminated Union Type_:
   ```typescript
-  type UnionType = {
-    discriminator: 'has-a',
-    a: string
-  } | {
-    discriminator: 'has-b',
-    b: boolean
-  }
+  type UnionType =
+    | {
+        discriminator: "has-a";
+        a: string;
+      }
+    | {
+        discriminator: "has-b";
+        b: boolean;
+      };
   ```
 - Simple **DSL-like** API
 - **Implementation that is easy to read and change**, so you can fork it and extend it without much hassle.

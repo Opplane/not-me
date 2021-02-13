@@ -1,24 +1,34 @@
 import { DefaultInvalidationMessagesManager } from "src/default-messages/default-invalition-messages-manager";
 import { BaseSchema } from "../base-schema";
 
-export class EqualsSchema<PossibleValues extends readonly unknown[]> extends BaseSchema<PossibleValues[number], PossibleValues[number], never> {
+export class EqualsSchema<
+  PossibleValues extends readonly unknown[]
+> extends BaseSchema<PossibleValues[number], PossibleValues[number], never> {
   constructor(possibleValues: PossibleValues, message?: string) {
     super((input, options) => {
-      if(possibleValues.includes(input)) {
+      if (possibleValues.includes(input)) {
         return {
           invalid: false,
-          value: input
-        }
+          value: input,
+        };
       } else {
         return {
           invalid: true,
-          messagesTree: [message || DefaultInvalidationMessagesManager.getDefaultMessages()?.equals?.notEqual || 'Input is not equal to any of the allowed values']
-        }
+          messagesTree: [
+            message ||
+              DefaultInvalidationMessagesManager.getDefaultMessages()?.equals
+                ?.notEqual ||
+              "Input is not equal to any of the allowed values",
+          ],
+        };
       }
-    })
+    });
   }
 }
 
-export function equals<PossibleValues extends readonly unknown[]>(possibleValues: PossibleValues, message?: string) {
-  return new EqualsSchema<PossibleValues>(possibleValues, message)
+export function equals<PossibleValues extends readonly unknown[]>(
+  possibleValues: PossibleValues,
+  message?: string
+) {
+  return new EqualsSchema<PossibleValues>(possibleValues, message);
 }

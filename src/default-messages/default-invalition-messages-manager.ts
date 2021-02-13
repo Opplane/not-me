@@ -12,7 +12,7 @@ class DefaultInvalidationMessagesManagerImpl {
   }
 
   resetDefaultMessages() {
-    this.defaultMessages = undefined
+    this.defaultMessages = undefined;
   }
 }
 

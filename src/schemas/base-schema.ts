@@ -3,54 +3,62 @@ import { NullableTypes } from "src/utils/types/nullable-types";
 import { FilterResult, Schema, ValidationOptions } from "./schema";
 
 enum FilterType {
-  Type = 'type',
-  Shape = 'shape',
-  Test = 'test',
-  Transform = 'transform'
+  Type = "type",
+  Shape = "shape",
+  Test = "test",
+  Transform = "transform",
 }
 
 type TypeFilter<Type> = {
-  type: FilterType.Type,
-  filterFn: (input: unknown, options: ValidationOptions | undefined) => FilterResult<Type>,
-}
+  type: FilterType.Type;
+  filterFn: (
+    input: unknown,
+    options: ValidationOptions | undefined
+  ) => FilterResult<Type>;
+};
 
 type ShapeFilter<Type> = {
-  type: FilterType.Shape,
-  filterFn: (input: Type, options: ValidationOptions | undefined) => FilterResult<Type>,
-}
+  type: FilterType.Shape;
+  filterFn: (
+    input: Type,
+    options: ValidationOptions | undefined
+  ) => FilterResult<Type>;
+};
 
 type TestFilter<V> = {
-  type: FilterType.Test,
-  filterFn: (value: V, options: ValidationOptions | undefined) => boolean,
-  message: string
-}
+  type: FilterType.Test;
+  filterFn: (value: V, options: ValidationOptions | undefined) => boolean;
+  message: string;
+};
 
 type TransformFilter<V, R> = {
-  type: FilterType.Transform,
-  filterFn: (value: V) => R
-}
+  type: FilterType.Transform;
+  filterFn: (value: V) => R;
+};
 
-
-
-export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTypes> implements Schema<Shape | NT> {
+export abstract class BaseSchema<
+  Type,
+  Shape extends Type,
+  NT extends NullableTypes
+> implements Schema<Shape | NT> {
   _outputType!: Shape | NT;
 
   private typeFilter: TypeFilter<Type>;
-  private shapeFilters: ShapeFilter<Type>[] = []
-  private valueFilters: Array<TestFilter<Shape> | TransformFilter<any, any>> = [];
+  private shapeFilters: ShapeFilter<Type>[] = [];
+  private valueFilters: Array<
+    TestFilter<Shape> | TransformFilter<any, any>
+  > = [];
 
   private allowNull = false;
   private isNullMessage?: string;
   private allowUndefined = true;
   private isUndefinedMessage?: string;
 
-  constructor(
-    typeFilterFn: TypeFilter<Type>['filterFn'],
-  ) {
+  constructor(typeFilterFn: TypeFilter<Type>["filterFn"]) {
     this.typeFilter = {
       type: FilterType.Type,
-      filterFn: typeFilterFn
-    }
+      filterFn: typeFilterFn,
+    };
   }
 
   validate(
@@ -61,7 +69,12 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
       if (!this.allowUndefined) {
         return {
           invalid: true,
-          messagesTree: [this.isUndefinedMessage || DefaultInvalidationMessagesManager.getDefaultMessages()?.base?.isUndefined || "Input is null"] as any,
+          messagesTree: [
+            this.isUndefinedMessage ||
+              DefaultInvalidationMessagesManager.getDefaultMessages()?.base
+                ?.isUndefined ||
+              "Input is null",
+          ] as any,
         };
       } else {
         return {
@@ -75,7 +88,12 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
       if (!this.allowNull) {
         return {
           invalid: true,
-          messagesTree: [this.isNullMessage || DefaultInvalidationMessagesManager.getDefaultMessages()?.base?.isNull || "Input is null"] as any,
+          messagesTree: [
+            this.isNullMessage ||
+              DefaultInvalidationMessagesManager.getDefaultMessages()?.base
+                ?.isNull ||
+              "Input is null",
+          ] as any,
         };
       } else {
         return {
@@ -90,19 +108,19 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
     */
     let typedValue = input;
 
-    const typeFilterResponse = this.typeFilter.filterFn(typedValue, options)
+    const typeFilterResponse = this.typeFilter.filterFn(typedValue, options);
 
-    if(typeFilterResponse.invalid) {
-      return typeFilterResponse as any
+    if (typeFilterResponse.invalid) {
+      return typeFilterResponse as any;
     } else {
-      typedValue = typeFilterResponse.value
+      typedValue = typeFilterResponse.value;
     }
 
     /*
       SHAPE FILTERS
     */
-    
-    let shapedValue = typedValue as Type
+
+    let shapedValue = typedValue as Type;
 
     for (const shapeFilter of this.shapeFilters) {
       const filterRes = shapeFilter.filterFn(shapedValue, options);
@@ -110,7 +128,7 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
       if (filterRes.invalid) {
         return filterRes as any;
       } else if (filterRes.value == null) {
-        return filterRes as any
+        return filterRes as any;
       }
     }
 
@@ -120,21 +138,21 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
     let value = shapedValue as Shape;
 
     for (const valueFilter of this.valueFilters) {
-      if(valueFilter.type === FilterType.Test) {
+      if (valueFilter.type === FilterType.Test) {
         const valid = valueFilter.filterFn(value, options);
 
-        if(valid || (!valid && !options?.abortEarly)) {
+        if (valid || (!valid && !options?.abortEarly)) {
           continue;
         } else {
           return {
             invalid: true,
-            messagesTree: [valueFilter.message] as any
-          }
+            messagesTree: [valueFilter.message] as any,
+          };
         }
       } else if (valueFilter.type === FilterType.Transform) {
-        value = valueFilter.filterFn(value)
+        value = valueFilter.filterFn(value);
       }
-      throw new Error()
+      throw new Error();
     }
 
     return {
@@ -143,37 +161,39 @@ export abstract class BaseSchema<Type, Shape extends Type, NT extends NullableTy
     };
   }
 
-  protected nullable(message?: string): BaseSchema<Type, Shape, NullableTypes | null> {
+  protected nullable(
+    message?: string
+  ): BaseSchema<Type, Shape, NullableTypes | null> {
     this.allowNull = true;
     this.isNullMessage = message;
-    return this as any
+    return this as any;
   }
-  protected defined(message?: string): BaseSchema<Type, Shape, Exclude<NullableTypes, undefined>> {
-    this.allowUndefined = false
-    this.isUndefinedMessage = message
-    return this as any
+  protected defined(
+    message?: string
+  ): BaseSchema<Type, Shape, Exclude<NullableTypes, undefined>> {
+    this.allowUndefined = false;
+    this.isUndefinedMessage = message;
+    return this as any;
   }
 
-  addShapeFilter(filterFn: ShapeFilter<Type>['filterFn']) {
+  addShapeFilter(filterFn: ShapeFilter<Type>["filterFn"]) {
     this.shapeFilters.push({
       type: FilterType.Shape,
-      filterFn
-    })
+      filterFn,
+    });
   }
 
   addTestFilter(filterFn: (value: Shape) => boolean, message: string) {
     this.valueFilters.push({
       type: FilterType.Test,
       filterFn,
-      message
-    })
+      message,
+    });
   }
-  addTransformFilter(filterFn: TransformFilter<Shape, any>['filterFn'],) {
+  addTransformFilter(filterFn: TransformFilter<Shape, any>["filterFn"]) {
     this.valueFilters.push({
       type: FilterType.Transform,
       filterFn,
-    })
+    });
   }
-
-
 }

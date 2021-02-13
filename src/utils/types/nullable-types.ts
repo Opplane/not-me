@@ -1,2 +1,2 @@
-export type NullableTypes = undefined | null
-export type DefaultNullableTypes = undefined
+export type NullableTypes = undefined | null;
+export type DefaultNullableTypes = undefined;

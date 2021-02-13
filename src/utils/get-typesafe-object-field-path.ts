@@ -1,17 +1,19 @@
 export type TypesafeObjectFieldPathPointer<T> = {
-  and<K extends keyof T>(keyOrIndex: K): TypesafeObjectFieldPathPointer<T[K]>,
-  end(): string
-}
+  and<K extends keyof T>(keyOrIndex: K): TypesafeObjectFieldPathPointer<T[K]>;
+  end(): string;
+};
 
 function getDeeperTypesafeObjectFieldPath<T>(previousRecursionPath: string) {
-  return <K extends keyof T>(keyOrIndex: K): TypesafeObjectFieldPathPointer<T[K]> => {
+  return <K extends keyof T>(
+    keyOrIndex: K
+  ): TypesafeObjectFieldPathPointer<T[K]> => {
     let newPath: string;
 
-    if (typeof keyOrIndex === 'number') {
+    if (typeof keyOrIndex === "number") {
       newPath = `${previousRecursionPath}[${keyOrIndex}]`;
-    } else if (typeof keyOrIndex === 'string') {
+    } else if (typeof keyOrIndex === "string") {
       newPath = `${previousRecursionPath}${
-        previousRecursionPath === '' ? '' : '.'
+        previousRecursionPath === "" ? "" : "."
       }${keyOrIndex}`;
     } else {
       throw new Error();
@@ -35,10 +37,10 @@ function getDeeperTypesafeObjectFieldPath<T>(previousRecursionPath: string) {
 */
 export function getTypesafeObjectFieldPath<T>(
   // Infer generic from argument, if any, to avoid having to pass a generic type manually
-  _values?: T,
+  _values?: T
 ): TypesafeObjectFieldPathPointer<T> {
   return {
-    and: getDeeperTypesafeObjectFieldPath<T>(''),
-    end: () => ''
+    and: getDeeperTypesafeObjectFieldPath<T>(""),
+    end: () => "",
   };
 }
