@@ -23,16 +23,45 @@
 - **Easy to extend**. You can create a new schema just by extending the classes from the ones provided here.
 - **Implementation that is easy to read and change**. If you really need so, you can fork this library and change it without much hassle.
 
+## Quick links:
+
+- [CONTRIBUTING](CONTRIBUTING.md)
+
 ## How it works under the hood:
 
-- When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. There are 3 types of filter functions, and they run in this order:
+When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. There are 3 types of filter functions, and they run in this order:
 
-  - **Type filter** will validate if your input is from a certain type (example: a number, an object, an array, etc...)
-  - **Shape filters** will validate the fields in your value. This only applies to object and array values
-  - **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value
+- **Type filter** will validate if your input is from a certain type (example: a number, an object, an array, etc...)
+- **Shape filters** will validate the fields in your value. This only applies to object and array values
+- **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value
 
-  You should also define what kind of nullable values can get throught at the end of the schema chain, by calling `nullable()` or `defined()`.
+You should also define what kind of nullable values can get throught at the end of the schema chain, by calling `nullable()` or `defined()`.
 
 ## Creating a schema of my own:
 
-- Just extend the class of the closest schema there is for your type of value, and call the `transform()` and `test()` methods in your new schema to setup the validation logic that will be run. Can be either in it's _constructor_, or you can add new methods to your schema.
+Just extend the class of the closest schema there is for your type of value, and call the `transform()` and `test()` methods in your new schema to setup the validation logic that will be run. Can be either in it's _constructor_, or you can add new methods to your schema.
+
+- Here's how an Integer Schema could be implemented:
+
+```typescript
+import { NumberSchema } from "not-me/lib/schemas/number/number-schema.ts";
+
+class IntegerSchema extends NumberSchema {
+  constructor(message?: string) {
+    super();
+
+    this.test(
+      (input) => Number.isInteger(input),
+      message || "Input is not an integer"
+    );
+  }
+}
+
+/*
+  Just a wrapper function so you don't have to write `new IntegerSchema()`.
+  It's more readable if you just call `integer()` inside a complex schema.
+*/
+export function integer(message?: string) {
+  return new IntegerSchema(message);
+}
+```
