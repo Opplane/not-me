@@ -6,6 +6,7 @@ import {
 } from "src/utils/types/nullable-types";
 import { BaseSchema } from "../base-schema";
 import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
+import { BaseType, objectTypeFilter } from "./object-type-filter";
 
 type SchemaObjToShape<
   SchemasObj extends { [key: string]: Schema<any> | undefined }
@@ -15,33 +16,17 @@ type SchemaObjToShape<
     : never;
 };
 
-type BaseType = { [key: string]: unknown };
 
 export class ObjectSchema<
-  Shape extends { [key: string]: unknown },
+  SchemaObj extends { [key: string]: Schema<unknown> },
   NT extends NullableTypes = DefaultNullableTypes
-> extends BaseSchema<BaseType, Shape, NT> {
+> extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>, NT> {
   constructor(
-    schemaObj: { [K in keyof Shape]: Schema<Shape[K]> },
+    schemaObj: SchemaObj,
     message?: string
   ) {
     super((input, options) => {
-      if (typeof input !== "object") {
-        return {
-          invalid: true,
-          messagesTree: [
-            message ||
-              DefaultInvalidationMessagesManager.getDefaultMessages()?.object
-                ?.notAnObject ||
-              "Input is not an object",
-          ],
-        };
-      }
-
-      return {
-        invalid: false,
-        value: input as BaseType,
-      };
+      return objectTypeFilter(input, message)
     });
 
     this.addShapeFilter((value: BaseType, options) => {
@@ -102,27 +87,27 @@ export class ObjectSchema<
     }
   }
 
-  public nullable(): ObjectSchema<Shape, NT | null> {
+  public nullable(): ObjectSchema<SchemaObj, NT | null> {
     return super.defined() as any;
   }
 
-  public defined(): ObjectSchema<Shape, Exclude<NT, undefined>> {
+  public defined(): ObjectSchema<SchemaObj, Exclude<NT, undefined>> {
     return super.defined() as any;
   }
 
   union<
     SchemaFactory extends (
-      value: Shape
+      value: SchemaObjToShape<SchemaObj>
     ) => { [key: string]: Schema<unknown> | undefined }
   >(
     schemaFactory: SchemaFactory
   ): ObjectSchema<
-    Omit<Shape, keyof SchemaObjToShape<ReturnType<SchemaFactory>>> &
-      SchemaObjToShape<ReturnType<SchemaFactory>>,
+    Omit<SchemaObj, keyof ReturnType<SchemaFactory>> &
+      ReturnType<SchemaFactory>,
     NT
   > {
     this.addShapeFilter((input, options) => {
-      const schema = schemaFactory(input as Shape);
+      const schema = schemaFactory(input as any);
 
       const result = this.validateObj(schema, input, options);
 
@@ -143,8 +128,9 @@ export class ObjectSchema<
   }
 }
 
-export function object<Shape extends { [key: string]: unknown }>(
-  schemaObj: { [K in keyof Shape]: Schema<Shape[K]> }
-): ObjectSchema<Shape> {
-  return new ObjectSchema(schemaObj);
+export function object<SchemaObj extends { [key: string]: Schema<unknown> }>(
+  schemaObj: SchemaObj,
+  message?: string
+): ObjectSchema<SchemaObj> {
+  return new ObjectSchema<SchemaObj>(schemaObj, message);
 }

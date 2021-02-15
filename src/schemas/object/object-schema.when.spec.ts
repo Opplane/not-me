@@ -2,7 +2,7 @@ import { equals } from "../equals/equals-schema";
 import { object } from "./object-schema";
 
 describe("Object Schema - When", () => {
-  it("Should accept object values with the correct union type descriminations", () => {
+  describe("Simple Union", () => {
     const schema = object({
       common: equals(["common"]),
       a: equals(["a", "b"] as const),
@@ -20,32 +20,48 @@ describe("Object Schema - When", () => {
       }
     });
 
-    type Expected = { common: string } & (
-      | { a: "a"; c: number }
-      | { a: "b"; d: boolean }
-    );
+    it("valid", () => {
+      type Expected = { common: string } & (
+        | { a: "a"; c: number }
+        | { a: "b"; d: boolean }
+      );
+  
+      const input: Expected = { common: "common", a: "a", c: 0 };
+  
+      const result = schema.validate(input);
+  
+      if (result.invalid) {
+        throw new Error();
+      } else {
+        const value: Expected = result.value;
+  
+        expect(value).toEqual(input);
+      }
+  
+      const input2: Expected = { common: "common", a: "b", d: false };
+      const result2 = schema.validate(input2);
+  
+      if (result2.invalid) {
+        throw new Error();
+      } else {
+        const value: Expected = result2.value;
+  
+        expect(value).toEqual(input2);
+      }
+    });
 
-    const input: Expected = { common: "common", a: "a", c: 0 };
+    it("invalid", () => {
+      const input = { common: "common", a: "b", d: 0 };
+  
+      const result = schema.validate(input);
 
-    const result = schema.validate(input);
-
-    if (result.invalid) {
-      throw new Error();
-    } else {
-      const value: Expected = result.value;
-
-      expect(value).toEqual(input);
-    }
-
-    const input2: Expected = { common: "common", a: "b", d: false };
-    const result2 = schema.validate(input2);
-
-    if (result2.invalid) {
-      throw new Error();
-    } else {
-      const value: Expected = result2.value;
-
-      expect(value).toEqual(input2);
-    }
-  });
+      expect(result).toEqual({
+        invalid: true,
+        messagesTree: {
+          d: ["Input is not equal to any of the allowed values"]
+        }
+      });
+    });
+  })
+  
 });
