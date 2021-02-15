@@ -1,4 +1,5 @@
 import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
+import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 import {
   DefaultNullableTypes,
   NullableTypes,
@@ -143,28 +144,48 @@ export abstract class BaseSchema<
     */
     let value = shapedValue as Shape;
 
+    let valueFilterErrors: string[] = []
+
     for (const valueFilter of this.valueFilters) {
       if (valueFilter.type === FilterType.Test) {
         const valid = valueFilter.filterFn(value, options);
 
-        if (valid || (!valid && !options?.abortEarly)) {
-          continue;
+        if (!valid) {
+          const messages = [valueFilter.getMessage()]
+
+          if(options?.abortEarly) {
+            return {
+              errors: true,
+              messagesTree: messages,
+            };
+          } else {
+            valueFilterErrors = [...valueFilterErrors, ...messages]
+            continue;
+          }
         } else {
-          return {
-            errors: true,
-            messagesTree: [valueFilter.getMessage()],
-          };
+          continue;
         }
       } else if (valueFilter.type === FilterType.Transform) {
         value = valueFilter.filterFn(value);
+        continue;
       }
+
       throw new Error();
     }
 
-    return {
-      errors: false,
-      value,
-    };
+    if(valueFilterErrors.length > 0) {
+      return {
+        errors: true,
+        messagesTree: valueFilterErrors,
+      };
+    } else {
+      return {
+        errors: false,
+        value,
+      };
+    }
+
+    
   }
 
   nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
@@ -210,7 +231,7 @@ export abstract class BaseSchema<
   test(
     testFunction: (value: Shape) => boolean,
     message: string | (() => string)
-  ): Schema<Shape | NT> {
+  ): BaseSchema<Shape | NT> {
     this.addTestFilter(
       testFunction,
       typeof message === "string" ? () => message : message
@@ -220,7 +241,7 @@ export abstract class BaseSchema<
 
   transform<TransformFunction extends (value: Shape) => unknown>(
     testFunction: TransformFunction
-  ): Schema<ReturnType<TransformFunction>> {
+  ): BaseSchema<ReturnType<TransformFunction>> {
     this.addTransformFilter(testFunction);
 
     return this as any;
