@@ -14,9 +14,18 @@ export function getErrorMessagesFromField<Output>(
   messagesTree: ErrorMessagesTree,
   pathGetter: (pointer: TypesafeObjectFieldPathPointer<Output>) => string
 ): string[] | undefined {
-  const path = pathGetter(getTypesafeObjectFieldPath(messagesTree));
+  const path = pathGetter({
+    ...getTypesafeObjectFieldPath(messagesTree),
+    end: () => "",
+  });
 
-  const node: ErrorMessagesTree = lodashGet(messagesTree, path);
+  let node: ErrorMessagesTree;
+
+  if (path === "") {
+    node = messagesTree;
+  } else {
+    node = lodashGet(messagesTree, path);
+  }
 
   if (node instanceof Array) {
     return node;
