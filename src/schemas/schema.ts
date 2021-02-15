@@ -1,12 +1,12 @@
-import { InvalitionMessagesTree } from "src/invalidation-messages/invalition-messages-tree";
+import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 
 export type FilterResult<Output> =
   | {
-      invalid: true;
-      messagesTree: InvalitionMessagesTree;
+      errors: true;
+      messagesTree: ErrorMessagesTree;
     }
   | {
-      invalid: false;
+      errors: false;
       value: Output;
     };
 

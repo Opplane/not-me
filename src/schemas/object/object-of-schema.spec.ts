@@ -11,18 +11,18 @@ describe("Object Of Schema", () => {
     });
 
     expect(result).toEqual({
-      invalid: false,
+      errors: false,
       value: { b: "a" },
     });
   });
 
-  it("invalid", () => {
+  it("errors", () => {
     const result: FilterResult<{ [key: string]: "a" }> = schema.validate({
       b: "b",
     });
 
     expect(result).toEqual({
-      invalid: true,
+      errors: true,
       messagesTree: {
         b: ["Field did not match any of the provided schemas"],
       },
@@ -33,7 +33,7 @@ describe("Object Of Schema", () => {
     const result: FilterResult<{ [key: string]: "a" }> = schema.validate(true);
 
     expect(result).toEqual({
-      invalid: true,
+      errors: true,
       messagesTree: ["Input is not an object"],
     });
   });

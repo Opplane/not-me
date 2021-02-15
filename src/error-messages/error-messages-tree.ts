@@ -4,19 +4,19 @@ import {
 } from "../utils/get-typesafe-object-field-path";
 import lodashGet from "lodash/get";
 
-export type InvalitionMessagesTree =
+export type ErrorMessagesTree =
   | undefined
   | string[]
-  | { [key: string]: InvalitionMessagesTree }
-  | { [key: number]: InvalitionMessagesTree };
+  | { [key: string]: ErrorMessagesTree }
+  | { [key: number]: ErrorMessagesTree };
 
 export function getErrorMessagesFromField<Output>(
-  messagesTree: InvalitionMessagesTree,
+  messagesTree: ErrorMessagesTree,
   pathGetter: (pointer: TypesafeObjectFieldPathPointer<Output>) => string
 ): string[] | undefined {
   const path = pathGetter(getTypesafeObjectFieldPath(messagesTree));
 
-  const node: InvalitionMessagesTree = lodashGet(messagesTree, path);
+  const node: ErrorMessagesTree = lodashGet(messagesTree, path);
 
   if (node instanceof Array) {
     return node;

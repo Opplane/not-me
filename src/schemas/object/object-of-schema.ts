@@ -1,9 +1,5 @@
-import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
-import { InvalitionMessagesTree } from "src/invalidation-messages/invalition-messages-tree";
-import {
-  DefaultNullableTypes,
-  NullableTypes,
-} from "src/utils/types/nullable-types";
+import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
+import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 import { BaseSchema } from "../base-schema";
 import { InferType, Schema } from "../schema";
 import { objectTypeFilter } from "./object-type-filter";
@@ -13,15 +9,13 @@ type BaseType = { [key: string]: unknown };
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
 
 export class ObjectOfSchema<
-  ValuesSchemas extends ValuesSchemasBase,
-  NT extends NullableTypes = DefaultNullableTypes
+  ValuesSchemas extends ValuesSchemasBase
 > extends BaseSchema<
   BaseType,
-  { [key: string]: InferType<ValuesSchemas[number]> },
-  NT
+  { [key: string]: InferType<ValuesSchemas[number]> }
 > {
   constructor(
-    valuesSchema: ValuesSchemas,
+    valuesSchemas: ValuesSchemas,
     message?: string,
     fieldDoesNotMatchMessage?: string
   ) {
@@ -29,19 +23,19 @@ export class ObjectOfSchema<
 
     this.addShapeFilter((input, options) => {
       const finalValue: { [key: string]: unknown } = {};
-      const errors: { [key: string]: InvalitionMessagesTree } = {};
+      const errors: { [key: string]: ErrorMessagesTree } = {};
 
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
         let validFieldResult:
-          | { invalid: false; value: unknown }
+          | { errors: false; value: unknown }
           | undefined = undefined;
 
-        for (const schema of valuesSchema) {
+        for (const schema of valuesSchemas) {
           const result = schema.validate(fieldValue);
 
-          if (!result.invalid) {
+          if (!result.errors) {
             validFieldResult = result;
             break;
           }
@@ -50,14 +44,14 @@ export class ObjectOfSchema<
         if (!validFieldResult) {
           const messages = [
             fieldDoesNotMatchMessage ||
-              DefaultInvalidationMessagesManager.getDefaultMessages()?.objectOf
+              DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
                 ?.fieldDoesNotMatch ||
               "Field did not match any of the provided schemas",
           ];
 
           if (options?.abortEarly) {
             return {
-              invalid: true,
+              errors: true,
               messagesTree: {
                 [fieldKey]: messages,
               },
@@ -72,12 +66,12 @@ export class ObjectOfSchema<
 
       if (Object.keys(errors).length > 0) {
         return {
-          invalid: true,
+          errors: true,
           messagesTree: errors,
         };
       } else {
         return {
-          invalid: false,
+          errors: false,
           value: finalValue,
         };
       }
@@ -86,12 +80,12 @@ export class ObjectOfSchema<
 }
 
 export function objectOf<ValuesSchemas extends ValuesSchemasBase>(
-  valuesSchema: ValuesSchemas,
+  valuesSchemas: ValuesSchemas,
   message?: string,
   fieldDoesNotMatchMessage?: string
 ): ObjectOfSchema<ValuesSchemas> {
   return new ObjectOfSchema<ValuesSchemas>(
-    valuesSchema,
+    valuesSchemas,
     message,
     fieldDoesNotMatchMessage
   );

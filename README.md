@@ -25,10 +25,13 @@
 ## How it works under the hood:
 
 - When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. There are 3 types of filter functions, and they run in this order:
+
   - **Type filter** will validate if your input is from a certain type (example: a number, an object, an array, etc...)
   - **Shape filters** will validate the fields in your value. This only applies to object and array values
   - **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value
 
+  You should also define what kind of nullable values can get throught at the end of the schema chain, by calling `nullable()` or `defined()`.
+
 ## Creating a schema of my own:
 
-- Just extend the class of the closest schema there is for your type of value, and use the `transform()` and `test()` functions to setup the logic that will be run in your new schema.
+- Just extend the class of the closest schema there is for your type of value, and call the `transform()` and `test()` methods in your new schema to setup the validation logic that will be run. Can be either in it's _constructor_, or you can add new methods to your schema.

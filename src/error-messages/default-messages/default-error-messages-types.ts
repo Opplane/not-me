@@ -1,8 +1,12 @@
-export type DefaultInvalidationMessages = Partial<{
+export type DefaultErrorMessages = Partial<{
   object: Partial<{
     notAnObject: string;
   }>;
   objectOf: Partial<{
+    fieldDoesNotMatch: string;
+  }>;
+  array: Partial<{
+    notAnArray: string;
     fieldDoesNotMatch: string;
   }>;
   base: Partial<{

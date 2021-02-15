@@ -9,7 +9,7 @@ describe("Object Schema", () => {
 
     const result = schema.validate({});
 
-    expect(result).toEqual({ invalid: false, value: {} });
+    expect(result).toEqual({ errors: false, value: {} });
   });
 
   it("Should fail with non-object input", () => {
@@ -20,7 +20,7 @@ describe("Object Schema", () => {
     const result = schema.validate({ a: 2 });
 
     expect(result).toEqual({
-      invalid: true,
+      errors: true,
       messagesTree: {
         a: ["Input is not an object"],
       },
@@ -35,7 +35,7 @@ describe("Object Schema", () => {
     const result = schema.validate({});
 
     expect(result).toEqual({
-      invalid: true,
+      errors: true,
       messagesTree: { a: ["Input is not defined"] },
     });
   });
@@ -46,7 +46,7 @@ describe("Object Schema", () => {
     const result: FilterResult<{}> = schema.validate({});
 
     expect(result).toEqual({
-      invalid: false,
+      errors: false,
       value: {},
     });
   });

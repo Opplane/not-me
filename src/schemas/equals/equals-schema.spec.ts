@@ -6,7 +6,7 @@ describe("Equals Schema", () => {
 
     const result = schema.validate(null);
 
-    if (result.invalid) {
+    if (result.errors) {
       throw new Error();
     } else {
       const value: "a" | null = result.value;
@@ -21,7 +21,7 @@ describe("Equals Schema", () => {
     const result = schema.validate("b");
 
     expect(result).toEqual({
-      invalid: true,
+      errors: true,
       messagesTree: ["Input is not equal to any of the allowed values"],
     });
   });

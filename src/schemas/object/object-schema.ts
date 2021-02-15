@@ -1,8 +1,4 @@
-import { InvalitionMessagesTree } from "src/invalidation-messages/invalition-messages-tree";
-import {
-  DefaultNullableTypes,
-  NullableTypes,
-} from "src/utils/types/nullable-types";
+import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 import { BaseSchema } from "../base-schema";
 import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
 import { BaseType, objectTypeFilter } from "./object-type-filter";
@@ -16,9 +12,8 @@ type SchemaObjToShape<
 };
 
 export class ObjectSchema<
-  SchemaObj extends { [key: string]: Schema<unknown> },
-  NT extends NullableTypes = DefaultNullableTypes
-> extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>, NT> {
+  SchemaObj extends { [key: string]: Schema<unknown> }
+> extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>> {
   constructor(schemaObj: SchemaObj, message?: string) {
     super((input, options) => {
       return objectTypeFilter(input, message);
@@ -40,8 +35,8 @@ export class ObjectSchema<
   ): FilterResult<{ [key: string]: unknown }> {
     const finalValue: BaseType = {};
 
-    const invalidFieldsErrorMessages: {
-      [key: string]: InvalitionMessagesTree;
+    const errorsFieldsErrorMessages: {
+      [key: string]: ErrorMessagesTree;
     } = {};
 
     for (const fieldKey of Object.keys(schemaObj)) {
@@ -51,43 +46,33 @@ export class ObjectSchema<
 
       const fieldResult = fieldSchema.validate(value[fieldKey], options);
 
-      if (fieldResult.invalid) {
+      if (fieldResult.errors) {
         if (options?.abortEarly) {
           return {
-            invalid: true,
+            errors: true,
             messagesTree: {
               [fieldKey]: fieldResult.messagesTree,
             } as any,
           };
         } else {
-          invalidFieldsErrorMessages[
-            fieldKey
-          ] = fieldResult.messagesTree as any;
+          errorsFieldsErrorMessages[fieldKey] = fieldResult.messagesTree as any;
         }
       } else {
         finalValue[fieldKey] = fieldResult.value;
       }
     }
 
-    if (Object.keys(invalidFieldsErrorMessages).length > 0) {
+    if (Object.keys(errorsFieldsErrorMessages).length > 0) {
       return {
-        invalid: true,
-        messagesTree: invalidFieldsErrorMessages,
+        errors: true,
+        messagesTree: errorsFieldsErrorMessages,
       };
     } else {
       return {
-        invalid: false,
+        errors: false,
         value: finalValue,
       };
     }
-  }
-
-  public nullable(): ObjectSchema<SchemaObj, NT | null> {
-    return super.defined() as any;
-  }
-
-  public defined(): ObjectSchema<SchemaObj, Exclude<NT, undefined>> {
-    return super.defined() as any;
   }
 
   union<
@@ -96,21 +81,23 @@ export class ObjectSchema<
     ) => { [key: string]: Schema<unknown> | undefined }
   >(
     schemaFactory: SchemaFactory
-  ): ObjectSchema<
-    Omit<SchemaObj, keyof ReturnType<SchemaFactory>> &
-      ReturnType<SchemaFactory>,
-    NT
+  ): BaseSchema<
+    BaseType,
+    SchemaObjToShape<
+      Omit<SchemaObj, keyof ReturnType<SchemaFactory>> &
+        ReturnType<SchemaFactory>
+    >
   > {
     this.addShapeFilter((input, options) => {
       const schema = schemaFactory(input as any);
 
       const result = this.validateObj(schema, input, options);
 
-      if (result.invalid) {
+      if (result.errors) {
         return result;
       } else {
         return {
-          invalid: false,
+          errors: false,
           value: {
             ...input,
             ...result.value,

@@ -1,4 +1,4 @@
-import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
+import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
 import { BaseSchema } from "../base-schema";
 
 export class EqualsSchema<
@@ -8,15 +8,15 @@ export class EqualsSchema<
     super((input, options) => {
       if (possibleValues.includes(input)) {
         return {
-          invalid: false,
+          errors: false,
           value: input,
         };
       } else {
         return {
-          invalid: true,
+          errors: true,
           messagesTree: [
             message ||
-              DefaultInvalidationMessagesManager.getDefaultMessages()?.equals
+              DefaultErrorMessagesManager.getDefaultMessages()?.equals
                 ?.notEqual ||
               "Input is not equal to any of the allowed values",
           ],

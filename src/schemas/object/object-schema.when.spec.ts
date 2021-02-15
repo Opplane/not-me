@@ -30,7 +30,7 @@ describe("Object Schema - When", () => {
 
       const result = schema.validate(input);
 
-      if (result.invalid) {
+      if (result.errors) {
         throw new Error();
       } else {
         const value: Expected = result.value;
@@ -41,7 +41,7 @@ describe("Object Schema - When", () => {
       const input2: Expected = { common: "common", a: "b", d: false };
       const result2 = schema.validate(input2);
 
-      if (result2.invalid) {
+      if (result2.errors) {
         throw new Error();
       } else {
         const value: Expected = result2.value;
@@ -50,13 +50,13 @@ describe("Object Schema - When", () => {
       }
     });
 
-    it("invalid", () => {
+    it("errors", () => {
       const input = { common: "common", a: "b", d: 0 };
 
       const result = schema.validate(input);
 
       expect(result).toEqual({
-        invalid: true,
+        errors: true,
         messagesTree: {
           d: ["Input is not equal to any of the allowed values"],
         },
