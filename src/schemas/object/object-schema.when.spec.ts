@@ -1,4 +1,5 @@
 import { equals } from "../equals/equals-schema";
+import { FilterResult, InferType } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema - When", () => {
@@ -28,7 +29,7 @@ describe("Object Schema - When", () => {
 
       const input: Expected = { common: "common", a: "a", c: 0 };
 
-      const result = schema.validate(input);
+      const result: FilterResult<Expected> = schema.validate(input);
 
       if (result.errors) {
         throw new Error();

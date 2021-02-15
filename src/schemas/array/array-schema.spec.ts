@@ -8,9 +8,11 @@ describe("Array Schema", () => {
       { [key: string]: "a" | "b" } | undefined
     > = objectOf([equals(["a"] as const)]);
 
-  const schema: Schema<Array<InferType<typeof objSchema>>> = array([
+  const arraySchema = array([
     objSchema
-  ]).defined();
+  ])
+
+  const schema: Schema<Array<InferType<typeof objSchema>> | undefined> = arraySchema;
 
   it("Should pass with correct values", () => {
     expect(schema.validate([undefined, undefined])).toEqual({
@@ -37,6 +39,20 @@ describe("Array Schema", () => {
       messagesTree: {
         2: { someProp: ["Input is not equal to any of the allowed values"] }
       },
+    });
+  });
+
+  it("Should fail if array length is over maximum", () => {
+    expect(arraySchema.max(1).validate([undefined, undefined, undefined])).toEqual({
+      errors: true,
+      messagesTree: ["Array has more elements than expected"],
+    });
+  });
+  
+  it("Should fail if array lenght is below minimum", () => {
+    expect(arraySchema.min(1).validate([])).toEqual({
+      errors: true,
+      messagesTree: ["Array has less elements than expected"],
     });
   });
 });
