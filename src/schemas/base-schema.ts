@@ -144,22 +144,22 @@ export abstract class BaseSchema<
     */
     let value = shapedValue as Shape;
 
-    let valueFilterErrors: string[] = []
+    let valueFilterErrors: string[] = [];
 
     for (const valueFilter of this.valueFilters) {
       if (valueFilter.type === FilterType.Test) {
         const valid = valueFilter.filterFn(value, options);
 
         if (!valid) {
-          const messages = [valueFilter.getMessage()]
+          const messages = [valueFilter.getMessage()];
 
-          if(options?.abortEarly) {
+          if (options?.abortEarly) {
             return {
               errors: true,
               messagesTree: messages,
             };
           } else {
-            valueFilterErrors = [...valueFilterErrors, ...messages]
+            valueFilterErrors = [...valueFilterErrors, ...messages];
             continue;
           }
         } else {
@@ -173,7 +173,7 @@ export abstract class BaseSchema<
       throw new Error();
     }
 
-    if(valueFilterErrors.length > 0) {
+    if (valueFilterErrors.length > 0) {
       return {
         errors: true,
         messagesTree: valueFilterErrors,
@@ -184,8 +184,6 @@ export abstract class BaseSchema<
         value,
       };
     }
-
-    
   }
 
   nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
