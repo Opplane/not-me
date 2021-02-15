@@ -8,12 +8,14 @@
     "declaration": true,
     "removeComments": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
     "baseUrl": "./",
     "incremental": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true
   }
 }

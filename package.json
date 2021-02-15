@@ -1,11 +1,13 @@
 {
-  "name": "u-knot-me",
+  "name": "not-me",
   "version": "1.0.0",
   "description": "Easy and type-safe validation",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "npm run clean && tsc --project tsconfig.release.json",
+    "build:watch": "tsc --project tsconfig.release.json --watch",
+    "clean": "rimraf lib",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -13,15 +15,20 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:debug:watch": "npm run test:debug -- --watch",
     "format": "prettier --write \"**/*.{js,jsx,json,ts,tsx,scss,sass,css,md}\"",
-    "precommit": "lint-staged && npm run build"
+    "precommit": "lint-staged && npm run typecheck"
   },
   "author": "Opplane",
   "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.20",
+    "@types/lodash": "^4.14.168",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "^26.5.1",
     "typescript": "^4.1.5"
   },
@@ -41,13 +48,12 @@
     "globals": {
       "ts-jest": {
         "isolatedModules": true,
-        "tsconfig": "tsconfig.test.json"
+        "tsconfig": "tsconfig.release.json"
       }
     },
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/src/",
-      "<rootDir>/libs/"
+      "<rootDir>/src/"
     ],
     "moduleDirectories": [
       "node_modules",
