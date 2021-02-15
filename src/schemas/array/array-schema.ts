@@ -69,9 +69,7 @@ export class ArraySchema<
       for (let index = 0; index < input.length; index++) {
         const element = input[index];
 
-        let lastFieldResult:
-          | FilterResult<any>
-          | undefined = undefined;
+        let lastFieldResult: FilterResult<any> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(element);
@@ -83,17 +81,20 @@ export class ArraySchema<
           }
         }
 
-        if(!lastFieldResult) {
-          throw new Error("No schemas were provided")
+        if (!lastFieldResult) {
+          throw new Error("No schemas were provided");
         }
 
         if (lastFieldResult.errors) {
-          const messages = valuesSchemas.length === 1 ? lastFieldResult.messagesTree :[
-            fieldDoesNotMatchMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
-                ?.fieldDoesNotMatch ||
-              "Field did not match any of the provided schemas",
-          ];
+          const messages =
+            valuesSchemas.length === 1
+              ? lastFieldResult.messagesTree
+              : [
+                  fieldDoesNotMatchMessage ||
+                    DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
+                      ?.fieldDoesNotMatch ||
+                    "Field did not match any of the provided schemas",
+                ];
 
           if (options?.abortEarly) {
             return {
@@ -121,7 +122,6 @@ export class ArraySchema<
           value: validatedArray,
         };
       }
-      
     });
   }
 

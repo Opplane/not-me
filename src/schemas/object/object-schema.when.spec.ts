@@ -1,5 +1,5 @@
 import { equals } from "../equals/equals-schema";
-import { FilterResult, InferType } from "../schema";
+import { FilterResult } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema - When", () => {

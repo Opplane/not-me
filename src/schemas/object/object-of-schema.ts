@@ -28,9 +28,7 @@ export class ObjectOfSchema<
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
-        let lastFieldResult:
-          | FilterResult<any>
-          | undefined = undefined;
+        let lastFieldResult: FilterResult<any> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(fieldValue);
@@ -41,17 +39,20 @@ export class ObjectOfSchema<
           }
         }
 
-        if(!lastFieldResult) {
-          throw new Error("No schemas were provided")
+        if (!lastFieldResult) {
+          throw new Error("No schemas were provided");
         }
 
         if (lastFieldResult.errors) {
-          const messages = valuesSchemas.length === 1 ? lastFieldResult.messagesTree : [
-            fieldDoesNotMatchMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
-                ?.fieldDoesNotMatch ||
-              "Field did not match any of the provided schemas",
-          ];
+          const messages =
+            valuesSchemas.length === 1
+              ? lastFieldResult.messagesTree
+              : [
+                  fieldDoesNotMatchMessage ||
+                    DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
+                      ?.fieldDoesNotMatch ||
+                    "Field did not match any of the provided schemas",
+                ];
 
           if (options?.abortEarly) {
             return {

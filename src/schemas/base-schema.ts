@@ -31,7 +31,7 @@ type ShapeFilter<Type> = {
 type TestFilter<V> = {
   type: FilterType.Test;
   filterFn: (value: V, options: ValidationOptions | undefined) => boolean;
-  message: string;
+  getMessage: () => string;
 };
 
 type TransformFilter<V, R> = {
@@ -78,7 +78,7 @@ export abstract class BaseSchema<
               DefaultErrorMessagesManager.getDefaultMessages()?.base
                 ?.isUndefined ||
               "Input is not defined",
-          ] as any,
+          ],
         };
       } else {
         return {
@@ -96,7 +96,7 @@ export abstract class BaseSchema<
             this.isNullMessage ||
               DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
               "Input is null",
-          ] as any,
+          ],
         };
       } else {
         return {
@@ -132,7 +132,7 @@ export abstract class BaseSchema<
       const filterRes = shapeFilter.filterFn(shapedValue, options);
 
       if (filterRes.errors) {
-        return filterRes as any;
+        return filterRes;
       } else if (filterRes.value == null) {
         return filterRes as any;
       }
@@ -152,7 +152,7 @@ export abstract class BaseSchema<
         } else {
           return {
             errors: true,
-            messagesTree: [valueFilter.message] as any,
+            messagesTree: [valueFilter.getMessage()],
           };
         }
       } else if (valueFilter.type === FilterType.Transform) {
@@ -187,11 +187,14 @@ export abstract class BaseSchema<
     });
   }
 
-  private addTestFilter(filterFn: (value: Shape) => boolean, message: string) {
+  private addTestFilter(
+    filterFn: (value: Shape) => boolean,
+    getMessage: () => string
+  ) {
     this.valueFilters.push({
       type: FilterType.Test,
       filterFn,
-      message,
+      getMessage,
     });
   }
 
@@ -206,9 +209,12 @@ export abstract class BaseSchema<
 
   test(
     testFunction: (value: Shape) => boolean,
-    message: string
+    message: string | (() => string)
   ): Schema<Shape | NT> {
-    this.addTestFilter(testFunction, message);
+    this.addTestFilter(
+      testFunction,
+      typeof message === "string" ? () => message : message
+    );
     return this as any;
   }
 

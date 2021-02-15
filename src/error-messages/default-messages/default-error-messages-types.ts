@@ -18,4 +18,8 @@ export type DefaultErrorMessages = Partial<{
   equals: Partial<{
     notEqual: string;
   }>;
+  number: Partial<{
+    notANumber: string;
+    isNotInteger: string;
+  }>;
 }>;

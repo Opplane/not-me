@@ -4,15 +4,15 @@ import { InferType, Schema } from "../schema";
 import { array } from "./array-schema";
 
 describe("Array Schema", () => {
-  const objSchema: Schema<
-      { [key: string]: "a" | "b" } | undefined
-    > = objectOf([equals(["a"] as const)]);
+  const objSchema: Schema<{ [key: string]: "a" | "b" } | undefined> = objectOf([
+    equals(["a"] as const),
+  ]);
 
-  const arraySchema = array([
-    objSchema
-  ])
+  const arraySchema = array([objSchema]);
 
-  const schema: Schema<Array<InferType<typeof objSchema>> | undefined> = arraySchema;
+  const schema: Schema<
+    Array<InferType<typeof objSchema>> | undefined
+  > = arraySchema;
 
   it("Should pass with correct values", () => {
     expect(schema.validate([undefined, undefined])).toEqual({
@@ -20,9 +20,9 @@ describe("Array Schema", () => {
       value: [undefined, undefined],
     });
 
-    expect(schema.validate([undefined, { someProp: 'a' }])).toEqual({
+    expect(schema.validate([undefined, { someProp: "a" }])).toEqual({
       errors: false,
-      value: [undefined, { someProp: 'a' }],
+      value: [undefined, { someProp: "a" }],
     });
   });
 
@@ -34,21 +34,23 @@ describe("Array Schema", () => {
   });
 
   it("Should fail with wrong values", () => {
-    expect(schema.validate([undefined, undefined, { someProp: 'c' }])).toEqual({
+    expect(schema.validate([undefined, undefined, { someProp: "c" }])).toEqual({
       errors: true,
       messagesTree: {
-        2: { someProp: ["Input is not equal to any of the allowed values"] }
+        2: { someProp: ["Input is not equal to any of the allowed values"] },
       },
     });
   });
 
   it("Should fail if array length is over maximum", () => {
-    expect(arraySchema.max(1).validate([undefined, undefined, undefined])).toEqual({
+    expect(
+      arraySchema.max(1).validate([undefined, undefined, undefined])
+    ).toEqual({
       errors: true,
       messagesTree: ["Array has more elements than expected"],
     });
   });
-  
+
   it("Should fail if array lenght is below minimum", () => {
     expect(arraySchema.min(1).validate([])).toEqual({
       errors: true,
