@@ -1,7 +1,7 @@
 import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
 import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 import { BaseSchema } from "../base-schema";
-import { InferType, Schema } from "../schema";
+import { FilterResult, InferType, Schema } from "../schema";
 import { objectTypeFilter } from "./object-type-filter";
 
 type BaseType = { [key: string]: unknown };
@@ -28,21 +28,25 @@ export class ObjectOfSchema<
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
-        let validFieldResult:
-          | { errors: false; value: unknown }
+        let lastFieldResult:
+          | FilterResult<any>
           | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(fieldValue);
+          lastFieldResult = result;
 
           if (!result.errors) {
-            validFieldResult = result;
             break;
           }
         }
 
-        if (!validFieldResult) {
-          const messages = [
+        if(!lastFieldResult) {
+          throw new Error("No schemas were provided")
+        }
+
+        if (lastFieldResult.errors) {
+          const messages = valuesSchemas.length === 1 ? lastFieldResult.messagesTree : [
             fieldDoesNotMatchMessage ||
               DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
                 ?.fieldDoesNotMatch ||
@@ -60,7 +64,7 @@ export class ObjectOfSchema<
             errors[fieldKey] = messages;
           }
         } else {
-          finalValue[fieldKey] = validFieldResult.value;
+          finalValue[fieldKey] = lastFieldResult.value;
         }
       }
 

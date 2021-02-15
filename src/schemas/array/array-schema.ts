@@ -1,7 +1,7 @@
 import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
 import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
 import { BaseSchema } from "../base-schema";
-import { InferType, Schema } from "../schema";
+import { FilterResult, InferType, Schema } from "../schema";
 
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
 type BaseType = unknown[];
@@ -69,21 +69,26 @@ export class ArraySchema<
       for (let index = 0; index < input.length; index++) {
         const element = input[index];
 
-        let validFieldResult:
-          | { errors: false; value: unknown }
+        let lastFieldResult:
+          | FilterResult<any>
           | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(element);
 
+          lastFieldResult = result;
+
           if (!result.errors) {
-            validFieldResult = result;
             break;
           }
         }
 
-        if (!validFieldResult) {
-          const messages = [
+        if(!lastFieldResult) {
+          throw new Error("No schemas were provided")
+        }
+
+        if (lastFieldResult.errors) {
+          const messages = valuesSchemas.length === 1 ? lastFieldResult.messagesTree :[
             fieldDoesNotMatchMessage ||
               DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
                 ?.fieldDoesNotMatch ||
@@ -101,14 +106,22 @@ export class ArraySchema<
             errors[index] = messages;
           }
         } else {
-          validatedArray.push(validFieldResult.value);
+          validatedArray.push(lastFieldResult.value);
         }
       }
 
-      return {
-        errors: false,
-        value: validatedArray,
-      };
+      if (Object.keys(errors).length > 0) {
+        return {
+          errors: true,
+          messagesTree: errors,
+        };
+      } else {
+        return {
+          errors: false,
+          value: validatedArray,
+        };
+      }
+      
     });
   }
 

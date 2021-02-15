@@ -24,7 +24,7 @@ describe("Object Of Schema", () => {
     expect(result).toEqual({
       errors: true,
       messagesTree: {
-        b: ["Field did not match any of the provided schemas"],
+        b: ["Input is not equal to any of the allowed values"],
       },
     });
   });
