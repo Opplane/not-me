@@ -1,4 +1,4 @@
-import { DefaultInvalidationMessagesManager } from "src/default-messages/default-invalition-messages-manager";
+import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
 import { BaseSchema } from "../base-schema";
 
 export class EqualsSchema<
@@ -23,6 +23,8 @@ export class EqualsSchema<
         };
       }
     });
+
+    this.nullable();
   }
 }
 

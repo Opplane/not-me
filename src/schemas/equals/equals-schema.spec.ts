@@ -18,7 +18,7 @@ describe("Equals Schema", () => {
   it("Should reject input when it does not match allowed values", () => {
     const schema = equals(["a", null] as const);
 
-    const result = schema.validate(null);
+    const result = schema.validate("b");
 
     expect(result).toEqual({
       invalid: true,

@@ -1,5 +1,5 @@
-import { DefaultInvalidationMessagesManager } from "src/default-messages/default-invalition-messages-manager";
-import { InvalitionMessagesTree } from "src/default-messages/invalition-messages-tree";
+import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
+import { InvalitionMessagesTree } from "src/invalidation-messages/invalition-messages-tree";
 import {
   DefaultNullableTypes,
   NullableTypes,
@@ -15,12 +15,12 @@ type SchemaObjToShape<
     : never;
 };
 
-type Type = { [key: string]: unknown };
+type BaseType = { [key: string]: unknown };
 
 export class ObjectSchema<
   Shape extends { [key: string]: unknown },
   NT extends NullableTypes = DefaultNullableTypes
-> extends BaseSchema<Type, Shape, NT> {
+> extends BaseSchema<BaseType, Shape, NT> {
   constructor(
     schemaObj: { [K in keyof Shape]: Schema<Shape[K]> },
     message?: string
@@ -40,11 +40,11 @@ export class ObjectSchema<
 
       return {
         invalid: false,
-        value: input as Type,
+        value: input as BaseType,
       };
     });
 
-    this.addShapeFilter((value: Type, options) => {
+    this.addShapeFilter((value: BaseType, options) => {
       return this.validateObj(schemaObj, value, options);
     });
   }
@@ -55,10 +55,10 @@ export class ObjectSchema<
     }
   >(
     schemaObj: PartialSchemaObj,
-    value: Type,
+    value: BaseType,
     options: ValidationOptions
   ): FilterResult<{ [key: string]: unknown }> {
-    const finalValue: Type = {};
+    const finalValue: BaseType = {};
 
     const invalidFieldsErrorMessages: {
       [key: string]: InvalitionMessagesTree;

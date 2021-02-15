@@ -1,20 +1,20 @@
-import { DefaultInvalidationMessagesManager } from "src/default-messages/default-invalition-messages-manager";
+import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
 import { NullableTypes } from "src/utils/types/nullable-types";
 import { FilterResult, Schema, ValidationOptions } from "./schema";
 
 enum FilterType {
-  Type = "type",
+  BaseType = "base-type",
   Shape = "shape",
   Test = "test",
   Transform = "transform",
 }
 
-type TypeFilter<Type> = {
-  type: FilterType.Type;
+type BaseTypeFilter<BaseType> = {
+  type: FilterType.BaseType;
   filterFn: (
     input: unknown,
     options: ValidationOptions | undefined
-  ) => FilterResult<Type>;
+  ) => FilterResult<BaseType>;
 };
 
 type ShapeFilter<Type> = {
@@ -37,14 +37,14 @@ type TransformFilter<V, R> = {
 };
 
 export abstract class BaseSchema<
-  Type,
-  Shape extends Type,
+  BaseType,
+  Shape extends BaseType,
   NT extends NullableTypes
 > implements Schema<Shape | NT> {
   _outputType!: Shape | NT;
 
-  private typeFilter: TypeFilter<Type>;
-  private shapeFilters: ShapeFilter<Type>[] = [];
+  private baseTypeFilter: BaseTypeFilter<BaseType>;
+  private shapeFilters: ShapeFilter<BaseType>[] = [];
   private valueFilters: Array<
     TestFilter<Shape> | TransformFilter<any, any>
   > = [];
@@ -54,9 +54,9 @@ export abstract class BaseSchema<
   private allowUndefined = true;
   private isUndefinedMessage?: string;
 
-  constructor(typeFilterFn: TypeFilter<Type>["filterFn"]) {
-    this.typeFilter = {
-      type: FilterType.Type,
+  constructor(typeFilterFn: BaseTypeFilter<BaseType>["filterFn"]) {
+    this.baseTypeFilter = {
+      type: FilterType.BaseType,
       filterFn: typeFilterFn,
     };
   }
@@ -73,7 +73,7 @@ export abstract class BaseSchema<
             this.isUndefinedMessage ||
               DefaultInvalidationMessagesManager.getDefaultMessages()?.base
                 ?.isUndefined ||
-              "Input is null",
+              "Input is not defined",
           ] as any,
         };
       } else {
@@ -104,11 +104,14 @@ export abstract class BaseSchema<
     }
 
     /*
-      TYPE FILTER
+      BASE TYPE FILTER
     */
     let typedValue = input;
 
-    const typeFilterResponse = this.typeFilter.filterFn(typedValue, options);
+    const typeFilterResponse = this.baseTypeFilter.filterFn(
+      typedValue,
+      options
+    );
 
     if (typeFilterResponse.invalid) {
       return typeFilterResponse as any;
@@ -120,7 +123,7 @@ export abstract class BaseSchema<
       SHAPE FILTERS
     */
 
-    let shapedValue = typedValue as Type;
+    let shapedValue = typedValue as BaseType;
 
     for (const shapeFilter of this.shapeFilters) {
       const filterRes = shapeFilter.filterFn(shapedValue, options);
@@ -163,37 +166,56 @@ export abstract class BaseSchema<
 
   protected nullable(
     message?: string
-  ): BaseSchema<Type, Shape, NullableTypes | null> {
+  ): BaseSchema<BaseType, Shape, NullableTypes | null> {
     this.allowNull = true;
     this.isNullMessage = message;
     return this as any;
   }
   protected defined(
     message?: string
-  ): BaseSchema<Type, Shape, Exclude<NullableTypes, undefined>> {
+  ): BaseSchema<BaseType, Shape, Exclude<NullableTypes, undefined>> {
     this.allowUndefined = false;
     this.isUndefinedMessage = message;
     return this as any;
   }
 
-  addShapeFilter(filterFn: ShapeFilter<Type>["filterFn"]) {
+  protected addShapeFilter(filterFn: ShapeFilter<BaseType>["filterFn"]) {
     this.shapeFilters.push({
       type: FilterType.Shape,
       filterFn,
     });
   }
 
-  addTestFilter(filterFn: (value: Shape) => boolean, message: string) {
+  private addTestFilter(filterFn: (value: Shape) => boolean, message: string) {
     this.valueFilters.push({
       type: FilterType.Test,
       filterFn,
       message,
     });
   }
-  addTransformFilter(filterFn: TransformFilter<Shape, any>["filterFn"]) {
+
+  private addTransformFilter(
+    filterFn: TransformFilter<Shape, any>["filterFn"]
+  ) {
     this.valueFilters.push({
       type: FilterType.Transform,
       filterFn,
     });
+  }
+
+  test(
+    testFunction: (value: Shape) => boolean,
+    message: string
+  ): Schema<Shape | NT> {
+    this.addTestFilter(testFunction, message);
+    return this as any;
+  }
+
+  transform<TransformFunction extends (value: Shape) => unknown>(
+    testFunction: TransformFunction
+  ): Schema<ReturnType<TransformFunction>> {
+    this.addTransformFilter(testFunction);
+
+    return this as any;
   }
 }

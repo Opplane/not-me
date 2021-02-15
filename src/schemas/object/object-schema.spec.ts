@@ -1,3 +1,4 @@
+import { FilterResult } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema", () => {
@@ -21,7 +22,7 @@ describe("Object Schema", () => {
     expect(result).toEqual({
       invalid: true,
       messagesTree: {
-        a: expect.any(String),
+        a: ["Input is not an object"],
       },
     });
   });
@@ -35,7 +36,18 @@ describe("Object Schema", () => {
 
     expect(result).toEqual({
       invalid: true,
-      messagesTree: { a: expect.any(String) },
+      messagesTree: { a: ["Input is not defined"] },
+    });
+  });
+
+  it("empty schema - empty object - pass", () => {
+    const schema = object({});
+
+    const result: FilterResult<{}> = schema.validate({});
+
+    expect(result).toEqual({
+      invalid: false,
+      value: {},
     });
   });
 });

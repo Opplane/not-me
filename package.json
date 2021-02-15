@@ -4,10 +4,10 @@
   "description": "Easy and type-safe validation",
   "main": "lib/index.js",
   "scripts": {
-    "build": "npm run clean && tsc",
-    "build:watch": "tsc --watch",
-    "build:release": "npm run clean && tsc --project tsconfig.release.json",
+    "build": "npm run clean && tsc --project tsconfig.release.json",
+    "build:watch": "tsc --project tsconfig.release.json --watch",
     "clean": "rimraf lib",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -15,7 +15,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:debug:watch": "npm run test:debug -- --watch",
     "format": "prettier --write \"**/*.{js,jsx,json,ts,tsx,scss,sass,css,md}\"",
-    "precommit": "lint-staged && npm run build"
+    "precommit": "lint-staged && npm run typecheck"
   },
   "author": "Opplane",
   "license": "ISC",
@@ -48,7 +48,7 @@
     "globals": {
       "ts-jest": {
         "isolatedModules": true,
-        "tsconfig": "tsconfig.json"
+        "tsconfig": "tsconfig.release.json"
       }
     },
     "testEnvironment": "node",
