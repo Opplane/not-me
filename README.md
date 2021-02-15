@@ -19,8 +19,9 @@
       };
   ```
 - Simple **DSL-like** API
-- **Implementation that is easy to read and change**, so you can fork it and extend it without much hassle.
 - **No need for _try/catches_**: the final result will always be returned as the transformed input, or a tree of error messages
+- **Easy to extend**. You can create a new schema just by extending the classes from the ones provided here.
+- **Implementation that is easy to read and change**. If you really need so, you can fork this library and change it without much hassle.
 
 ## How it works under the hood:
 

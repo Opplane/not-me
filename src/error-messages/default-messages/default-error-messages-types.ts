@@ -8,6 +8,8 @@ export type DefaultErrorMessages = Partial<{
   array: Partial<{
     notAnArray: string;
     fieldDoesNotMatch: string;
+    lessThanMinimum: string;
+    moreThanMaximum: string;
   }>;
   base: Partial<{
     isNull: string;

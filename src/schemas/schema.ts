@@ -17,4 +17,4 @@ export type Schema<Output> = {
   validate(input: unknown, options?: ValidationOptions): FilterResult<Output>;
 };
 
-export type InferType<S extends { _outputType: unknown }> = S["_outputType"];
+export type InferType<S extends Schema<unknown>> = S["_outputType"];

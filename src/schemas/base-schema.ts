@@ -41,7 +41,7 @@ type TransformFilter<V, R> = {
 
 export abstract class BaseSchema<
   BaseType,
-  Shape extends BaseType,
+  Shape extends BaseType = BaseType,
   NT extends NullableTypes = DefaultNullableTypes
 > implements Schema<Shape | NT> {
   _outputType!: Shape | NT;
@@ -167,16 +167,14 @@ export abstract class BaseSchema<
     };
   }
 
-  nullable(
-    message?: string
-  ): BaseSchema<BaseType, Shape, NullableTypes | null> {
+  nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
     this.allowNull = true;
     this.isNullMessage = message;
     return this as any;
   }
   defined(
     message?: string
-  ): BaseSchema<BaseType, Shape, Exclude<NullableTypes, undefined>> {
+  ): BaseSchema<BaseType, Shape, Exclude<NT, undefined>> {
     this.allowUndefined = false;
     this.isUndefinedMessage = message;
     return this as any;
