@@ -1,4 +1,3 @@
-import { DefaultInvalidationMessagesManager } from "src/invalidation-messages/default-messages/default-invalition-messages-manager";
 import { InvalitionMessagesTree } from "src/invalidation-messages/invalition-messages-tree";
 import {
   DefaultNullableTypes,
@@ -16,17 +15,13 @@ type SchemaObjToShape<
     : never;
 };
 
-
 export class ObjectSchema<
   SchemaObj extends { [key: string]: Schema<unknown> },
   NT extends NullableTypes = DefaultNullableTypes
 > extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>, NT> {
-  constructor(
-    schemaObj: SchemaObj,
-    message?: string
-  ) {
+  constructor(schemaObj: SchemaObj, message?: string) {
     super((input, options) => {
-      return objectTypeFilter(input, message)
+      return objectTypeFilter(input, message);
     });
 
     this.addShapeFilter((value: BaseType, options) => {

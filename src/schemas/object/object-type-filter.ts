@@ -3,7 +3,10 @@ import { FilterResult } from "../schema";
 
 export type BaseType = { [key: string]: unknown };
 
-export function objectTypeFilter (input: unknown, message?: string): FilterResult<BaseType> {
+export function objectTypeFilter(
+  input: unknown,
+  message?: string
+): FilterResult<BaseType> {
   if (typeof input !== "object") {
     return {
       invalid: true,
