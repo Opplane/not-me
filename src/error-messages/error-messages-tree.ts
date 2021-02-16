@@ -7,8 +7,7 @@ import lodashGet from "lodash/get";
 export type ErrorMessagesTree =
   | undefined
   | string[]
-  | { [key: string]: ErrorMessagesTree }
-  | { [key: number]: ErrorMessagesTree };
+  | { [key: string]: ErrorMessagesTree };
 
 export function getErrorMessagesFromField<Output>(
   messagesTree: ErrorMessagesTree,
