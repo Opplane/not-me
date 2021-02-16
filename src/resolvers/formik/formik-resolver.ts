@@ -1,6 +1,6 @@
 import { FormikErrors } from "formik";
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
-import { InferType, Schema } from "src/schemas/schema";
+import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { InferType, Schema } from "../../schemas/schema";
 
 type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 

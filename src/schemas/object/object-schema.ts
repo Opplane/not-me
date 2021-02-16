@@ -1,4 +1,4 @@
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
+import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
 import { BaseType, objectTypeFilter } from "./object-type-filter";

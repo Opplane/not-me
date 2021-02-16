@@ -1,5 +1,5 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { FilterResult, InferType, Schema } from "../schema";
 

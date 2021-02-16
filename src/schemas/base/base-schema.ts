@@ -1,8 +1,8 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
 import {
   DefaultNullableTypes,
   NullableTypes,
-} from "src/utils/types/nullable-types";
+} from "../../utils/types/nullable-types";
 import { FilterResult, Schema, ValidationOptions } from "../schema";
 
 enum FilterType {

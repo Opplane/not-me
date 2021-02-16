@@ -1,4 +1,4 @@
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
+import { ErrorMessagesTree } from "../error-messages/error-messages-tree";
 
 export type FilterResult<Output> =
   | {

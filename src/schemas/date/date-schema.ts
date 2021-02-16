@@ -1,4 +1,4 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
 import { BaseSchema } from "../base/base-schema";
 
 export class DateSchema extends BaseSchema<Date> {
