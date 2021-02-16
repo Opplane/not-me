@@ -1,31 +1,32 @@
 import { equals } from "../equals/equals-schema";
-import { FilterResult } from "../schema";
+import { FilterResult, InferType, Schema } from "../schema";
 import { object } from "./object-schema";
 
-describe("Object Schema - When", () => {
+describe("Object Schema - Union", () => {
   describe("Simple Union", () => {
-    const schema = object({
+    const schema: Schema<
+      { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
+    > = object({
       common: equals(["common"]),
       a: equals(["a", "b"] as const),
-    }).union((v) => {
-      if (v.a === "a") {
-        return {
-          a: equals(["a"] as const),
-          c: equals([0]),
-        };
-      } else {
-        return {
-          a: equals(["b"] as const),
-          d: equals([false]),
-        };
-      }
-    });
+    })
+      .union((v) => {
+        if (v.a === "a") {
+          return {
+            a: equals(["a"] as const),
+            c: equals([0]),
+          };
+        } else {
+          return {
+            a: equals(["b"] as const),
+            d: equals([false]),
+          };
+        }
+      })
+      .defined();
 
     it("valid", () => {
-      type Expected = { common: string } & (
-        | { a: "a"; c: number }
-        | { a: "b"; d: boolean }
-      );
+      type Expected = InferType<typeof schema>;
 
       const input: Expected = { common: "common", a: "a", c: 0 };
 

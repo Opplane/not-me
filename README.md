@@ -32,7 +32,7 @@
 
 ### Imports:
 
-Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since some legacy systems and some bundlers like React Native's _Metro_ do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
+Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
 ### Type utilities (at `not-me/lib/schemas/schema`):
 
@@ -55,6 +55,36 @@ import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver";
 <Formik /* (...) */ validate={formikResolver(notMeSchema)}>
   {/* (...) */}
 </Formik>;
+```
+
+### Union typed schemas:
+
+```typescript
+/*
+  schema will output
+  { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
+
+  `as const` statements are needed to infer the literal value (like 'a' | 'b')
+  instead of a generic value like `string`
+*/
+const schema = object({
+  common: equals(["common"]),
+  a: equals(["a", "b"] as const),
+})
+  .union((v) => {
+    if (v.a === "a") {
+      return {
+        a: equals(["a"] as const),
+        c: equals([0]),
+      };
+    } else {
+      return {
+        a: equals(["b"] as const),
+        d: equals([false]),
+      };
+    }
+  })
+  .defined();
 ```
 
 ### How it works under the hood:
