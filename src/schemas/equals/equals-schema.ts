@@ -1,5 +1,5 @@
 import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { BaseSchema } from "../base-schema";
+import { BaseSchema } from "../base/base-schema";
 
 export class EqualsSchema<
   PossibleValues extends readonly unknown[]

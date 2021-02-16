@@ -3,7 +3,7 @@ import {
   DefaultNullableTypes,
   NullableTypes,
 } from "src/utils/types/nullable-types";
-import { BaseSchema } from "../base-schema";
+import { BaseSchema } from "../base/base-schema";
 
 export class StringSchema<
   NT extends NullableTypes = DefaultNullableTypes

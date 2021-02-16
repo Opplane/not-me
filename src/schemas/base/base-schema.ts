@@ -3,7 +3,7 @@ import {
   DefaultNullableTypes,
   NullableTypes,
 } from "src/utils/types/nullable-types";
-import { FilterResult, Schema, ValidationOptions } from "./schema";
+import { FilterResult, Schema, ValidationOptions } from "../schema";
 
 enum FilterType {
   BaseType = "base-type",
