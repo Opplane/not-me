@@ -52,7 +52,9 @@ import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver.ts";
 
 // (...)
 
-<Formik /* (...) */ validate={formikResolver(notMeSchema)}>/* (...) */</Formik>;
+<Formik /* (...) */ validate={formikResolver(notMeSchema)}>
+  {/* (...) */}
+</Formik>;
 ```
 
 ### How it works under the hood:
