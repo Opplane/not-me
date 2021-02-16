@@ -32,7 +32,7 @@
 
 ### Imports:
 
-Keeping an app's code splitted into lazy loaded small chunks is a priority for frontend development. Since some legacy systems and some bundlers like React Native's _Metro_ do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
+Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since some legacy systems and some bundlers like React Native's _Metro_ do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
 ### Type utilities (at `not-me/lib/schemas/schema`):
 
