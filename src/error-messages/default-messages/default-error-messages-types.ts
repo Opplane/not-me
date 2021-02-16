@@ -22,4 +22,12 @@ export type DefaultErrorMessages = Partial<{
     notANumber: string;
     isNotInteger: string;
   }>;
+  string: Partial<{
+    notAString: string;
+    notFilled: string;
+  }>;
+  date: Partial<{
+    notADate: string;
+    invalidDate: string;
+  }>;
 }>;

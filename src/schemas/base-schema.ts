@@ -228,17 +228,21 @@ export abstract class BaseSchema<
   test(
     testFunction: (value: Shape) => boolean,
     message: string | (() => string)
-  ): BaseSchema<Shape | NT> {
+  ): this {
     this.addTestFilter(
       testFunction,
       typeof message === "string" ? () => message : message
     );
-    return this as any;
+    return this;
   }
 
   transform<TransformFunction extends (value: Shape) => unknown>(
     testFunction: TransformFunction
-  ): BaseSchema<ReturnType<TransformFunction>> {
+  ): BaseSchema<
+    ReturnType<TransformFunction>,
+    ReturnType<TransformFunction>,
+    NT
+  > {
     this.addTransformFilter(testFunction);
 
     return this as any;
