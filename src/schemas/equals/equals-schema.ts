@@ -5,7 +5,7 @@ export class EqualsSchema<
   PossibleValues extends readonly unknown[]
 > extends BaseSchema<PossibleValues[number], PossibleValues[number], never> {
   constructor(possibleValues: PossibleValues, message?: string) {
-    super((input, options) => {
+    super((input) => {
       if (possibleValues.includes(input)) {
         return {
           errors: false,

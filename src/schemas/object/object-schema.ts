@@ -15,7 +15,7 @@ export class ObjectSchema<
   SchemaObj extends { [key: string]: Schema<unknown> }
 > extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>> {
   constructor(schemaObj: SchemaObj, message?: string) {
-    super((input, options) => {
+    super((input) => {
       return objectTypeFilter(input, message);
     });
 

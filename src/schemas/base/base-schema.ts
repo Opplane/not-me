@@ -14,10 +14,7 @@ enum FilterType {
 
 type BaseTypeFilter<BaseType> = {
   type: FilterType.BaseType;
-  filterFn: (
-    input: unknown,
-    options: ValidationOptions | undefined
-  ) => FilterResult<BaseType>;
+  filterFn: (input: unknown) => FilterResult<BaseType>;
 };
 
 type ShapeFilter<Type> = {
@@ -30,7 +27,7 @@ type ShapeFilter<Type> = {
 
 type TestFilter<V> = {
   type: FilterType.Test;
-  filterFn: (value: V, options: ValidationOptions | undefined) => boolean;
+  filterFn: (value: V) => boolean;
   getMessage: () => string;
 };
 
@@ -111,10 +108,7 @@ export abstract class BaseSchema<
     */
     let typedValue = input;
 
-    const typeFilterResponse = this.baseTypeFilter.filterFn(
-      typedValue,
-      options
-    );
+    const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
 
     if (typeFilterResponse.errors) {
       return typeFilterResponse as any;
@@ -147,7 +141,7 @@ export abstract class BaseSchema<
 
     for (const valueFilter of this.valueFilters) {
       if (valueFilter.type === FilterType.Test) {
-        const valid = valueFilter.filterFn(value, options);
+        const valid = valueFilter.filterFn(value);
 
         if (!valid) {
           const messages = [valueFilter.getMessage()];
