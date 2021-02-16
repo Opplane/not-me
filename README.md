@@ -34,7 +34,7 @@
 
 Keeping an app's code splitted into lazy loaded small chunks is a priority for frontend development. Since some legacy systems and some bundlers like React Native's _Metro_ do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
-### Type utilities (at `not-me/lib/schemas/schema.ts`):
+### Type utilities (at `not-me/lib/schemas/schema`):
 
 - **`InferType<typeof schema>`**: get the output type of a schema
 - **`Schema<T>`**: dictates that a value is a schema that has an output type of `T`
@@ -48,7 +48,7 @@ This package includes validation resolvers to work with the following form libra
 #### <a name="formik"></a> Formik
 
 ```tsx
-import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver.ts";
+import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver";
 
 // (...)
 
@@ -74,7 +74,7 @@ Just extend the class of the closest schema there is for your type of value, and
 - Here's how an Integer Schema could be implemented:
 
 ```typescript
-import { NumberSchema } from "not-me/lib/schemas/number/number-schema.ts";
+import { NumberSchema } from "not-me/lib/schemas/number/number-schema";
 
 class IntegerSchema extends NumberSchema {
   constructor(message?: string) {
