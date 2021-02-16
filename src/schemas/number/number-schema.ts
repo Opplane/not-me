@@ -36,9 +36,7 @@ export class NumberSchema extends BaseSchema<number> {
 
   integer(message?: string) {
     this.test(
-      (input) => {
-        return Number.isInteger(input);
-      },
+      (input) => Number.isInteger(input),
       () =>
         message ||
         DefaultErrorMessagesManager.getDefaultMessages()?.number

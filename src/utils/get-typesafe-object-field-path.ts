@@ -38,9 +38,8 @@ function getDeeperTypesafeObjectFieldPath<T>(previousRecursionPath: string) {
 export function getTypesafeObjectFieldPath<T>(
   // Infer generic from argument, if any, to avoid having to pass a generic type manually
   _values?: T
-): TypesafeObjectFieldPathPointer<T> {
+): Pick<TypesafeObjectFieldPathPointer<T>, "and"> {
   return {
     and: getDeeperTypesafeObjectFieldPath<T>(""),
-    end: () => "",
   };
 }
