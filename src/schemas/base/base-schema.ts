@@ -54,6 +54,7 @@ export abstract class BaseSchema<
   private isNullMessage?: string;
   private allowUndefined = true;
   private isUndefinedMessage?: string;
+  private defaultValue?: this["_outputType"];
 
   constructor(typeFilterFn: BaseTypeFilter<BaseType>["filterFn"]) {
     this.baseTypeFilter = {
@@ -65,8 +66,15 @@ export abstract class BaseSchema<
   validate(
     input: unknown,
     options: ValidationOptions = undefined
-  ): FilterResult<Shape> {
+  ): FilterResult<this["_outputType"]> {
     if (input === undefined) {
+      if (this.defaultValue !== undefined) {
+        return {
+          errors: false,
+          value: this.defaultValue,
+        };
+      }
+
       if (!this.allowUndefined) {
         return {
           errors: true,
@@ -240,5 +248,11 @@ export abstract class BaseSchema<
     this.addTransformFilter(testFunction);
 
     return this as any;
+  }
+
+  default(value: this["_outputType"]): this {
+    this.defaultValue = value;
+
+    return this;
   }
 }
