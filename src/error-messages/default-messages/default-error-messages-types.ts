@@ -30,4 +30,7 @@ export type DefaultErrorMessages = Partial<{
     notADate: string;
     invalidDate: string;
   }>;
+  boolean: Partial<{
+    notABoolean: string;
+  }>;
 }>;
