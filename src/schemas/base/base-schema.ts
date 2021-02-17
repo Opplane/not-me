@@ -57,6 +57,8 @@ export abstract class BaseSchema<
   private isUndefinedMessage?: string;
   private defaultValue?: this["_outputType"];
 
+  protected mapMode?: boolean;
+
   constructor(typeFilterFn: BaseTypeFilter<BaseType>["filterFn"]) {
     this.baseTypeFilter = {
       type: FilterType.BaseType,
@@ -129,21 +131,43 @@ export abstract class BaseSchema<
       SHAPE FILTERS
     */
 
-    let shapedValue = typedValue as BaseType;
+    let shapedValue: BaseType;
 
-    for (let i = 0; i < this.shapeFilters.length; i++) {
-      const shapeFilter = this.shapeFilters[i] || throwError();
+    if (this.mapMode) {
+      shapedValue = {} as BaseType;
+      let shapedValueWithUnknownProperties = typedValue as BaseType;
 
-      const filterRes = shapeFilter.filterFn(shapedValue, options);
+      for (let i = 0; i < this.shapeFilters.length; i++) {
+        const shapeFilter = this.shapeFilters[i] || throwError();
 
-      if (filterRes.errors) {
-        return filterRes;
+        const filterRes = shapeFilter.filterFn(
+          shapedValueWithUnknownProperties,
+          options
+        );
+
+        if (filterRes.errors) {
+          return filterRes;
+        } else {
+          shapedValue = Object.assign(shapedValue, filterRes.value);
+          shapedValueWithUnknownProperties = Object.assign(
+            shapedValueWithUnknownProperties,
+            filterRes.value
+          );
+        }
       }
-      // Strip unknown fields after all shape validations
-      else if (i === this.shapeFilters.length - 1) {
-        shapedValue = filterRes.value;
-      } else {
-        shapedValue = Object.assign(shapedValue, filterRes.value);
+    } else {
+      shapedValue = typedValue as BaseType;
+
+      for (let i = 0; i < this.shapeFilters.length; i++) {
+        const shapeFilter = this.shapeFilters[i] || throwError();
+
+        const filterRes = shapeFilter.filterFn(shapedValue, options);
+
+        if (filterRes.errors) {
+          return filterRes;
+        } else {
+          shapedValue = filterRes.value;
+        }
       }
     }
 

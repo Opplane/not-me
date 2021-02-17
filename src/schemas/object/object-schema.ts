@@ -27,6 +27,8 @@ export class ObjectSchema<
     this.addShapeFilter((value: BaseType, options) => {
       return this.validateObj(schemaObj, value, options);
     });
+
+    this.mapMode = true;
   }
 
   private validateObj<
