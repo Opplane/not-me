@@ -5,7 +5,7 @@ import { InferType, Schema } from "../../schemas/schema";
 type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 
 function traverseErrorMessagesTree<T>(current: {
-  [key: string]: AnyErrorMessagesTree<undefined>;
+  [key: string]: AnyErrorMessagesTree;
 }): FormikErrors<T> {
   const convertedObj: FormikErrors<any> = {};
 
