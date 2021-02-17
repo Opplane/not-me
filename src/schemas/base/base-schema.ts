@@ -1,4 +1,5 @@
 import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { throwError } from "../../utils/throw-error";
 import {
   DefaultNullableTypes,
   NullableTypes,
@@ -130,13 +131,19 @@ export abstract class BaseSchema<
 
     let shapedValue = typedValue as BaseType;
 
-    for (const shapeFilter of this.shapeFilters) {
+    for (let i = 0; i < this.shapeFilters.length; i++) {
+      const shapeFilter = this.shapeFilters[i] || throwError();
+
       const filterRes = shapeFilter.filterFn(shapedValue, options);
 
       if (filterRes.errors) {
         return filterRes;
-      } else {
+      }
+      // Strip unknown fields after all shape validations
+      else if (i === this.shapeFilters.length - 1) {
         shapedValue = filterRes.value;
+      } else {
+        shapedValue = Object.assign(shapedValue, filterRes.value);
       }
     }
 
