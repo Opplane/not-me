@@ -135,7 +135,7 @@ export abstract class BaseSchema<
 
       if (filterRes.errors) {
         return filterRes;
-      } else if (filterRes.value == null) {
+      } else {
         shapedValue = filterRes.value;
       }
     }

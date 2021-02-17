@@ -2,7 +2,9 @@ import { equals } from "./equals-schema";
 
 describe("Equals Schema", () => {
   it("Should accept input when it matches allowed values", () => {
-    const schema = equals(["a", null] as const);
+    const schema = equals(["a"] as const)
+      .nullable()
+      .defined();
 
     const result = schema.validate(null);
 
