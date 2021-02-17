@@ -7,19 +7,19 @@ describe("Object Schema - Union", () => {
     const schema: Schema<
       { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
     > = object({
-      common: equals(["common"]),
-      a: equals(["a", "b"] as const),
+      common: equals(["common"]).defined(),
+      a: equals(["a", "b"] as const).defined(),
     })
       .union((v) => {
         if (v.a === "a") {
           return {
-            a: equals(["a"] as const),
-            c: equals([0]),
+            a: equals(["a"] as const).defined(),
+            c: equals([0]).defined(),
           };
         } else {
           return {
-            a: equals(["b"] as const),
-            d: equals([false]),
+            a: equals(["b"] as const).defined(),
+            d: equals([false]).defined(),
           };
         }
       })

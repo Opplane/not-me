@@ -26,7 +26,7 @@ export class ObjectSchema<
 
   private validateObj<
     PartialSchemaObj extends {
-      [key: string]: Schema<unknown> | any;
+      [key: string]: Schema<unknown> | undefined;
     }
   >(
     schemaObj: PartialSchemaObj,
