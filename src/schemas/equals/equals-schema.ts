@@ -3,7 +3,7 @@ import { BaseSchema } from "../base/base-schema";
 
 export class EqualsSchema<
   PossibleValues extends readonly unknown[]
-> extends BaseSchema<PossibleValues[number], PossibleValues[number], never> {
+> extends BaseSchema<PossibleValues[number]> {
   constructor(possibleValues: PossibleValues, message?: string) {
     super((input) => {
       if (possibleValues.includes(input)) {
@@ -23,8 +23,6 @@ export class EqualsSchema<
         };
       }
     });
-
-    this.nullable();
   }
 }
 
