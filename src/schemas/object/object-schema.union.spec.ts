@@ -1,5 +1,5 @@
 import { equals } from "../equals/equals-schema";
-import { FilterResult, InferType, Schema } from "../schema";
+import { ValidationResult, InferType, Schema } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema - Union", () => {
@@ -30,7 +30,7 @@ describe("Object Schema - Union", () => {
 
       const input: Expected = { common: "common", a: "a", c: 0 };
 
-      const result: FilterResult<Expected> = schema.validate(input);
+      const result: ValidationResult<Expected> = schema.validate(input);
 
       if (result.errors) {
         throw new Error();

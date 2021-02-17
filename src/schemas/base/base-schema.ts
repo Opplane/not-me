@@ -4,7 +4,7 @@ import {
   DefaultNullableTypes,
   NullableTypes,
 } from "../../utils/types/nullable-types";
-import { FilterResult, Schema, ValidationOptions } from "../schema";
+import { ValidationResult, Schema, ValidationOptions } from "../schema";
 
 enum FilterType {
   BaseType = "base-type",
@@ -15,7 +15,7 @@ enum FilterType {
 
 type BaseTypeFilter<BaseType> = {
   type: FilterType.BaseType;
-  filterFn: (input: unknown) => FilterResult<BaseType>;
+  filterFn: (input: unknown) => ValidationResult<BaseType>;
 };
 
 type ShapeFilter<Type> = {
@@ -23,7 +23,7 @@ type ShapeFilter<Type> = {
   filterFn: (
     input: Type,
     options: ValidationOptions | undefined
-  ) => FilterResult<Type>;
+  ) => ValidationResult<Type>;
 };
 
 type TestFilter<V> = {
@@ -67,7 +67,7 @@ export abstract class BaseSchema<
   validate(
     input: unknown,
     options: ValidationOptions = undefined
-  ): FilterResult<this["_outputType"]> {
+  ): ValidationResult<this["_outputType"]> {
     if (input === undefined) {
       if (this.defaultValue !== undefined) {
         return {

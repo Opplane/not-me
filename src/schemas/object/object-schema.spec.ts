@@ -1,5 +1,5 @@
 import { equals } from "../equals/equals-schema";
-import { FilterResult } from "../schema";
+import { ValidationResult } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema", () => {
@@ -44,7 +44,7 @@ describe("Object Schema", () => {
   it("empty schema - empty object - pass", () => {
     const schema = object({}).defined();
 
-    const result: FilterResult<{}> = schema.validate({});
+    const result: ValidationResult<{}> = schema.validate({});
 
     expect(result).toEqual({
       errors: false,
@@ -55,7 +55,7 @@ describe("Object Schema", () => {
   it("strip unknown fields", () => {
     const schema = object({ a: equals(["a"] as const).defined() }).defined();
 
-    const result: FilterResult<{ a: "a" }> = schema.validate({
+    const result: ValidationResult<{ a: "a" }> = schema.validate({
       a: "a",
       b: "b",
     });

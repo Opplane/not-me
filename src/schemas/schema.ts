@@ -1,6 +1,6 @@
 import { ErrorMessagesTree } from "../error-messages/error-messages-tree";
 
-export type FilterResult<Output> =
+export type ValidationResult<Output> =
   | {
       errors: true;
       messagesTree: ErrorMessagesTree;
@@ -14,7 +14,10 @@ export type ValidationOptions = { abortEarly?: boolean } | undefined;
 
 export type Schema<Output> = {
   _outputType: Output;
-  validate(input: unknown, options?: ValidationOptions): FilterResult<Output>;
+  validate(
+    input: unknown,
+    options?: ValidationOptions
+  ): ValidationResult<Output>;
 };
 
 export type InferType<S extends Schema<unknown>> = S["_outputType"];

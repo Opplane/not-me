@@ -1,6 +1,11 @@
 import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
-import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
+import {
+  ValidationResult,
+  InferType,
+  Schema,
+  ValidationOptions,
+} from "../schema";
 import { BaseType, objectTypeFilter } from "./object-type-filter";
 
 type SchemaObjToShape<
@@ -32,7 +37,7 @@ export class ObjectSchema<
     schemaObj: PartialSchemaObj,
     value: BaseType,
     options: ValidationOptions
-  ): FilterResult<{ [key: string]: unknown }> {
+  ): ValidationResult<{ [key: string]: unknown }> {
     const finalValue: BaseType = {};
 
     const errorsFieldsErrorMessages: {
