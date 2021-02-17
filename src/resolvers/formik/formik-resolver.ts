@@ -1,11 +1,11 @@
 import { FormikErrors } from "formik";
-import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { InferType, Schema } from "../../schemas/schema";
 
 type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 
 function traverseErrorMessagesTree<T>(current: {
-  [key: string]: ErrorMessagesTree;
+  [key: string]: AnyErrorMessagesTree<undefined>;
 }): FormikErrors<T> {
   const convertedObj: FormikErrors<any> = {};
 

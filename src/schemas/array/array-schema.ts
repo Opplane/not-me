@@ -1,5 +1,5 @@
 import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
-import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { ValidationResult, InferType, Schema } from "../schema";
 
@@ -40,7 +40,7 @@ export class ArraySchema<
     });
 
     this.addShapeFilter((input, options) => {
-      const errors: { [key: number]: ErrorMessagesTree } = {};
+      const errors: { [key: number]: AnyErrorMessagesTree } = {};
 
       const validatedArray = [];
 

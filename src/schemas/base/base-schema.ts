@@ -4,7 +4,14 @@ import {
   DefaultNullableTypes,
   NullableTypes,
 } from "../../utils/types/nullable-types";
-import { ValidationResult, Schema, ValidationOptions } from "../schema";
+import {
+  ValidationResult,
+  Schema,
+  ValidationOptions,
+  AcceptedValueValidationResult,
+  RejectedValueValidationResult,
+  InferType,
+} from "../schema";
 
 enum FilterType {
   BaseType = "base-type",
@@ -42,7 +49,8 @@ export abstract class BaseSchema<
   Shape extends BaseType = BaseType,
   NT extends NullableTypes = DefaultNullableTypes
 > implements Schema<Shape | NT> {
-  _outputType!: Shape | NT;
+  _rejectedValueValidationResult!: RejectedValueValidationResult;
+  _acceptedValueValidationResult!: AcceptedValueValidationResult<Shape | NT>;
   _nullableTypes!: NT;
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
@@ -55,7 +63,7 @@ export abstract class BaseSchema<
   private isNullMessage?: string;
   private allowUndefined = true;
   private isUndefinedMessage?: string;
-  private defaultValue?: this["_outputType"];
+  private defaultValue?: InferType<this>;
 
   protected mapMode?: boolean;
 
@@ -69,7 +77,7 @@ export abstract class BaseSchema<
   validate(
     input: unknown,
     options: ValidationOptions = undefined
-  ): ValidationResult<this["_outputType"]> {
+  ): ValidationResult<InferType<this>> {
     if (input === undefined) {
       if (this.defaultValue !== undefined) {
         return {
@@ -87,7 +95,7 @@ export abstract class BaseSchema<
                 ?.isUndefined ||
               "Input is not defined",
           ],
-        };
+        } as this["_rejectedValueValidationResult"];
       } else {
         return {
           errors: false,
@@ -105,7 +113,7 @@ export abstract class BaseSchema<
               DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
               "Input is null",
           ],
-        };
+        } as this["_rejectedValueValidationResult"];
       } else {
         return {
           errors: false,
@@ -146,7 +154,7 @@ export abstract class BaseSchema<
         );
 
         if (filterRes.errors) {
-          return filterRes;
+          return filterRes as this["_rejectedValueValidationResult"];
         } else {
           shapedValue = Object.assign(shapedValue, filterRes.value);
           shapedValueWithUnknownProperties = Object.assign(
@@ -164,7 +172,7 @@ export abstract class BaseSchema<
         const filterRes = shapeFilter.filterFn(shapedValue, options);
 
         if (filterRes.errors) {
-          return filterRes;
+          return filterRes as this["_rejectedValueValidationResult"];
         } else {
           shapedValue = filterRes.value;
         }
@@ -188,7 +196,7 @@ export abstract class BaseSchema<
           if (options?.abortEarly) {
             return {
               errors: true,
-              messagesTree: messages,
+              messagesTree: messages as this["_rejectedValueValidationResult"]["messagesTree"],
             };
           } else {
             valueFilterErrors = [...valueFilterErrors, ...messages];
@@ -209,7 +217,7 @@ export abstract class BaseSchema<
       return {
         errors: true,
         messagesTree: valueFilterErrors,
-      };
+      } as this["_rejectedValueValidationResult"];
     } else {
       return {
         errors: false,
@@ -281,7 +289,7 @@ export abstract class BaseSchema<
     return this as any;
   }
 
-  default(value: this["_outputType"]): this {
+  default(value: InferType<this>): this {
     this.defaultValue = value;
 
     return this;

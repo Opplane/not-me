@@ -1,4 +1,4 @@
-import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import {
   ValidationResult,
@@ -43,7 +43,7 @@ export class ObjectSchema<
     const finalValue: BaseType = {};
 
     const errorsFieldsErrorMessages: {
-      [key: string]: ErrorMessagesTree;
+      [key: string]: AnyErrorMessagesTree;
     } = {};
 
     for (const fieldKey of Object.keys(schemaObj)) {

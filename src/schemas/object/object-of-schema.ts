@@ -1,5 +1,5 @@
 import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
-import { ErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { ValidationResult, InferType, Schema } from "../schema";
 import { objectTypeFilter } from "./object-type-filter";
@@ -23,7 +23,7 @@ export class ObjectOfSchema<
 
     this.addShapeFilter((input, options) => {
       const finalValue: { [key: string]: unknown } = {};
-      const errors: { [key: string]: ErrorMessagesTree } = {};
+      const errors: { [key: string]: AnyErrorMessagesTree } = {};
 
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
