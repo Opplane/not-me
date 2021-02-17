@@ -9,6 +9,11 @@ export class BooleanSchema extends BaseSchema<boolean> {
           errors: false,
           value: input,
         };
+      } else if (input === "true" || input === "false") {
+        return {
+          errors: false,
+          value: input === "true",
+        };
       } else {
         const typeErrorMessage = [
           message ||
