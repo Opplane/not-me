@@ -1,11 +1,11 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { BaseSchema } from "../base-schema";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { BaseSchema } from "../base/base-schema";
 
 export class EqualsSchema<
   PossibleValues extends readonly unknown[]
-> extends BaseSchema<PossibleValues[number], PossibleValues[number], never> {
+> extends BaseSchema<PossibleValues[number]> {
   constructor(possibleValues: PossibleValues, message?: string) {
-    super((input, options) => {
+    super((input) => {
       if (possibleValues.includes(input)) {
         return {
           errors: false,
@@ -23,8 +23,6 @@ export class EqualsSchema<
         };
       }
     });
-
-    this.nullable();
   }
 }
 

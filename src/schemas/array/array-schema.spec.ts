@@ -5,7 +5,7 @@ import { array } from "./array-schema";
 
 describe("Array Schema", () => {
   const objSchema: Schema<{ [key: string]: "a" | "b" } | undefined> = objectOf([
-    equals(["a"] as const),
+    equals(["a"] as const).defined(),
   ]);
 
   const arraySchema = array([objSchema]);

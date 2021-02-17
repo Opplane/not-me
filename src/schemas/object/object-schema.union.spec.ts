@@ -1,5 +1,5 @@
 import { equals } from "../equals/equals-schema";
-import { FilterResult, InferType, Schema } from "../schema";
+import { ValidationResult, InferType, Schema } from "../schema";
 import { object } from "./object-schema";
 
 describe("Object Schema - Union", () => {
@@ -7,19 +7,19 @@ describe("Object Schema - Union", () => {
     const schema: Schema<
       { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
     > = object({
-      common: equals(["common"]),
-      a: equals(["a", "b"] as const),
+      common: equals(["common"]).defined(),
+      a: equals(["a", "b"] as const).defined(),
     })
       .union((v) => {
         if (v.a === "a") {
           return {
-            a: equals(["a"] as const),
-            c: equals([0]),
+            a: equals(["a"] as const).defined(),
+            c: equals([0]).defined(),
           };
         } else {
           return {
-            a: equals(["b"] as const),
-            d: equals([false]),
+            a: equals(["b"] as const).defined(),
+            d: equals([false]).defined(),
           };
         }
       })
@@ -30,7 +30,7 @@ describe("Object Schema - Union", () => {
 
       const input: Expected = { common: "common", a: "a", c: 0 };
 
-      const result: FilterResult<Expected> = schema.validate(input);
+      const result: ValidationResult<Expected> = schema.validate(input);
 
       if (result.errors) {
         throw new Error();

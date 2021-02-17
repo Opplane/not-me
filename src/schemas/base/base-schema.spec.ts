@@ -1,5 +1,5 @@
-import { number } from "./number/number-schema";
-import { object } from "./object/object-schema";
+import { number } from "../number/number-schema";
+import { object } from "../object/object-schema";
 
 describe("Base Schema", () => {
   it("Fail with multiple error messages", () => {

@@ -4,13 +4,13 @@ import {
 } from "../utils/get-typesafe-object-field-path";
 import lodashGet from "lodash/get";
 
-export type ErrorMessagesTree =
-  | undefined
+export type AnyErrorMessagesTree<U extends undefined = never> =
+  | U
   | string[]
-  | { [key: string]: ErrorMessagesTree };
+  | { [key: string]: AnyErrorMessagesTree<undefined> };
 
 export function getErrorMessagesFromField<Output>(
-  messagesTree: ErrorMessagesTree,
+  messagesTree: AnyErrorMessagesTree,
   pathGetter: (pointer: TypesafeObjectFieldPathPointer<Output>) => string
 ): string[] | undefined {
   const path = pathGetter({
@@ -18,12 +18,12 @@ export function getErrorMessagesFromField<Output>(
     end: () => "",
   });
 
-  let node: ErrorMessagesTree;
+  let node: AnyErrorMessagesTree;
 
   if (path === "") {
     node = messagesTree;
   } else {
-    node = lodashGet(messagesTree, path);
+    node = lodashGet(messagesTree, path) as AnyErrorMessagesTree;
   }
 
   if (node instanceof Array) {

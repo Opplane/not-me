@@ -1,7 +1,7 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
-import { BaseSchema } from "../base-schema";
-import { FilterResult, InferType, Schema } from "../schema";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { BaseSchema } from "../base/base-schema";
+import { ValidationResult, InferType, Schema } from "../schema";
 import { objectTypeFilter } from "./object-type-filter";
 
 type BaseType = { [key: string]: unknown };
@@ -23,12 +23,12 @@ export class ObjectOfSchema<
 
     this.addShapeFilter((input, options) => {
       const finalValue: { [key: string]: unknown } = {};
-      const errors: { [key: string]: ErrorMessagesTree } = {};
+      const errors: { [key: string]: AnyErrorMessagesTree } = {};
 
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
-        let lastFieldResult: FilterResult<any> | undefined = undefined;
+        let lastFieldResult: ValidationResult<any> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(fieldValue);

@@ -1,5 +1,5 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { BaseSchema } from "../base-schema";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { BaseSchema } from "../base/base-schema";
 
 export class NumberSchema extends BaseSchema<number> {
   constructor(message?: string) {

@@ -1,12 +1,12 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { FilterResult } from "../schema";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { ValidationResult } from "../schema";
 
 export type BaseType = { [key: string]: unknown };
 
 export function objectTypeFilter(
   input: unknown,
   message?: string
-): FilterResult<BaseType> {
+): ValidationResult<BaseType> {
   if (typeof input !== "object") {
     return {
       errors: true,

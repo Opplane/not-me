@@ -1,6 +1,11 @@
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
-import { BaseSchema } from "../base-schema";
-import { FilterResult, InferType, Schema, ValidationOptions } from "../schema";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { BaseSchema } from "../base/base-schema";
+import {
+  ValidationResult,
+  InferType,
+  Schema,
+  ValidationOptions,
+} from "../schema";
 import { BaseType, objectTypeFilter } from "./object-type-filter";
 
 type SchemaObjToShape<
@@ -15,28 +20,30 @@ export class ObjectSchema<
   SchemaObj extends { [key: string]: Schema<unknown> }
 > extends BaseSchema<BaseType, SchemaObjToShape<SchemaObj>> {
   constructor(schemaObj: SchemaObj, message?: string) {
-    super((input, options) => {
+    super((input) => {
       return objectTypeFilter(input, message);
     });
 
     this.addShapeFilter((value: BaseType, options) => {
       return this.validateObj(schemaObj, value, options);
     });
+
+    this.mapMode = true;
   }
 
   private validateObj<
     PartialSchemaObj extends {
-      [key: string]: Schema<unknown> | any;
+      [key: string]: Schema<unknown> | undefined;
     }
   >(
     schemaObj: PartialSchemaObj,
     value: BaseType,
     options: ValidationOptions
-  ): FilterResult<{ [key: string]: unknown }> {
+  ): ValidationResult<{ [key: string]: unknown }> {
     const finalValue: BaseType = {};
 
     const errorsFieldsErrorMessages: {
-      [key: string]: ErrorMessagesTree;
+      [key: string]: AnyErrorMessagesTree;
     } = {};
 
     for (const fieldKey of Object.keys(schemaObj)) {

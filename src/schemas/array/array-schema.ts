@@ -1,7 +1,7 @@
-import { DefaultErrorMessagesManager } from "src/error-messages/default-messages/default-error-messages-manager";
-import { ErrorMessagesTree } from "src/error-messages/error-messages-tree";
-import { BaseSchema } from "../base-schema";
-import { FilterResult, InferType, Schema } from "../schema";
+import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
+import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { BaseSchema } from "../base/base-schema";
+import { ValidationResult, InferType, Schema } from "../schema";
 
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
 type BaseType = unknown[];
@@ -40,7 +40,7 @@ export class ArraySchema<
     });
 
     this.addShapeFilter((input, options) => {
-      const errors: { [key: number]: ErrorMessagesTree } = {};
+      const errors: { [key: number]: AnyErrorMessagesTree } = {};
 
       const validatedArray = [];
 
@@ -69,7 +69,7 @@ export class ArraySchema<
       for (let index = 0; index < input.length; index++) {
         const element = input[index];
 
-        let lastFieldResult: FilterResult<any> | undefined = undefined;
+        let lastFieldResult: ValidationResult<any> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(element);

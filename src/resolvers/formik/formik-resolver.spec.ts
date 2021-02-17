@@ -1,7 +1,7 @@
 import { FormikErrors } from "formik";
-import { number } from "src/schemas/number/number-schema";
-import { object } from "src/schemas/object/object-schema";
-import { InferType } from "src/schemas/schema";
+import { number } from "../../schemas/number/number-schema";
+import { object } from "../../schemas/object/object-schema";
+import { InferType } from "../../schemas/schema";
 import { formikResolver } from "./formik-resolver";
 
 describe("Formik resolver", () => {

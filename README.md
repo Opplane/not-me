@@ -22,11 +22,20 @@
 - **No need for _try/catches_**: the final result will always be returned as the transformed input, or a tree of error messages. This way, there is no need to rearrange the flow to accomodate the _try/catch_, while reminding you to deal with validation errors
 - **Easy to extend**. You can create a new schema just by extending the classes from the ones provided here
 - **Implementation that is easy to read and change**. If you really need so, you can fork this library and change it without much hassle
+- **API inspired** by `yup` and `joi`
 - **Maintained by [Opplane](https://opplane.com/)**, a company from the Intelligent Apps and Connectivity sectors
 
 ## Quick links:
 
 - [CONTRIBUTING](CONTRIBUTING.md)
+
+## Motivation behind this package
+
+This package was built in order to fix some shortcomings (specially with _type safety_) that many validation libraries have. Most validation libraries try to do a lot, and their code starts getting confusing and with a lot of back and forths. As consequence, unsolved Github issues start pilling up, improving the libraries ourselves becomes hard since there are too many flows and a lot of history behind them, and a lot of broad types (like `any` or `object`) start surfacing and undermining the _type safety_ of a project.
+
+Having a separate type and a schema for each entity is also not a viable solution, since if one of them is changed, the developer has to remember to update the other one too, and that opens doors to human error.
+
+Our take on validation with `not-me` is almost to provide you with enough boilerplate for you to build your own validations schemas. This way, it's easy to maintain and improve this package.
 
 ## How to use it
 
