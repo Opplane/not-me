@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Easy and type-safe validation",
   "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.release.json",
     "build:watch": "tsc --project tsconfig.release.json --watch",
