@@ -12,7 +12,7 @@ export class NumberSchema extends BaseSchema<number> {
       ];
 
       if (typeof input === "number" || typeof input === "string") {
-        const number = Number(input);
+        const number = typeof input === "number" ? input : Number(input);
 
         if (isNaN(number)) {
           return {
