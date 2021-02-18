@@ -76,7 +76,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
   ```typescript
   import { Module, OnApplicationShutdown } from "@nestjs/common";
   import { APP_PIPE } from "@nestjs/core";
-  import { NotMeValidationPipe } from "not-me/resolvers/nest/validation.pipe";
+  import { NotMeValidationPipe } from "not-me/lib/resolvers/nest/validation.pipe";
 
   @Module({
     providers: [
@@ -94,10 +94,10 @@ By integrating this resolver with your NestJS project, arguments annotated with 
   > Tie both the DTO type and the schema type by **implementing the schema's inferred type**
 
   ```typescript
-  import { object } from "not-me/schemas/object/object-schema";
-  import { string } from "not-me/schemas/string/string-schema";
-  import { InferType } from "not-me/schemas/schema";
-  import { ValidationSchema } from "not-me/resolvers/nest/validation-schema.decorator";
+  import { object } from "not-me/lib/schemas/object/object-schema";
+  import { string } from "not-me/lib/schemas/string/string-schema";
+  import { InferType } from "not-me/lib/schemas/schema";
+  import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
 
   const schema = object({
     field: string().required(),
