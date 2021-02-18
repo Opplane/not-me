@@ -23,6 +23,8 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
+    "@nestjs/common": "^7.6.12",
+    "@nestjs/core": "^7.6.12",
     "@types/jest": "^26.0.20",
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.2",
