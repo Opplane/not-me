@@ -23,7 +23,7 @@
 - **Easy to extend**. You can create a new schema just by extending the classes from the ones provided here
 - **Implementation that is easy to read and change**. If you really need so, you can fork this library and change it without much hassle
 - **API inspired** by `yup` and `joi`
-- **Maintained by [Opplane](https://opplane.com/)**, a company from the Intelligent Apps and Connectivity sectors
+- **Maintained by [Opplane](https://opplane.com/)**, a company working in the Intelligent Apps and Connectivity sectors
 
 ## Quick links:
 
