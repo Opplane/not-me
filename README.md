@@ -28,6 +28,7 @@
 ## Quick links:
 
 - [CONTRIBUTING](CONTRIBUTING.md)
+- [LICENSE](LICENSE.md)
 
 ## Motivation behind this package
 

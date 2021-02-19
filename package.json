@@ -6,6 +6,9 @@
   "files": [
     "lib"
   ],
+  "engines": {
+    "node": ">=12"
+  },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.release.json",
     "build:watch": "tsc --project tsconfig.release.json --watch",
@@ -21,7 +24,7 @@
     "precommit": "lint-staged && npm run typecheck"
   },
   "author": "Opplane",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.20"
   },
@@ -69,5 +72,13 @@
   },
   "lint-staged": {
     "*.{js,jsx,json,ts,tsx,scss,sass,css,md}": "prettier --write"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opplane/not-me.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Opplane/not-me/issues"
+  },
+  "homepage": "https://github.com/Opplane/not-me"
 }
