@@ -5,3 +5,4 @@ node_modules
 
 *.json
 *.js
+index.d.ts
