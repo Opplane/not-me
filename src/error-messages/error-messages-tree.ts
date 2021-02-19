@@ -4,10 +4,10 @@ import {
 } from "../utils/get-typesafe-object-field-path";
 import lodashGet from "lodash/get";
 
-export type AnyErrorMessagesTree<U extends undefined = never> =
-  | U
+export type AnyErrorMessagesTree<IsRootOfTree extends true | false = false> =
+  | (IsRootOfTree extends true ? never : undefined)
   | string[]
-  | { [key: string]: AnyErrorMessagesTree<undefined> };
+  | { [key: string]: AnyErrorMessagesTree };
 
 export function getErrorMessagesFromField<Output>(
   messagesTree: AnyErrorMessagesTree,

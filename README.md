@@ -28,6 +28,7 @@
 ## Quick links:
 
 - [CONTRIBUTING](CONTRIBUTING.md)
+- [LICENSE](LICENSE.md)
 
 ## Motivation behind this package
 
@@ -53,6 +54,7 @@ Keeping an app's code splitted into small lazy-loaded chunks is a priority for f
 This package includes validation resolvers to work with the following form libraries:
 
 - [Formik](#formik)
+- [Nest](#nest)
 
 #### <a name="formik"></a> Formik
 
@@ -66,6 +68,48 @@ import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver";
 </Formik>;
 ```
 
+#### <a name="nest"></a> Nest
+
+By integrating this resolver with your NestJS project, arguments annotated with `@Param`, `@Query` and `@Body` will need to be typed as **ES6 classes** annotated with `@ValidationSchema`, in order to get the validation schema throught reflection.
+
+- `app.ts`
+
+  ```typescript
+  import { Module, OnApplicationShutdown } from "@nestjs/common";
+  import { APP_PIPE } from "@nestjs/core";
+  import { NotMeValidationPipe } from "not-me/lib/resolvers/nest/validation.pipe";
+
+  @Module({
+    providers: [
+      {
+        provide: APP_PIPE,
+        useClass: NotMeValidationPipe,
+      },
+    ],
+  })
+  export class AppModule {}
+  ```
+
+- `any-data.dto.ts`
+
+  > Tie both the DTO type and the schema type by **implementing the schema's inferred type**
+
+  ```typescript
+  import { object } from "not-me/lib/schemas/object/object-schema";
+  import { string } from "not-me/lib/schemas/string/string-schema";
+  import { InferType } from "not-me/lib/schemas/schema";
+  import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+
+  const schema = object({
+    field: string().required(),
+  });
+
+  @ValidationSchema(schema)
+  export class AnyDataDTO implements InferType<typeof schema> {
+    field: string;
+  }
+  ```
+
 ### Union typed schemas:
 
 ```typescript
@@ -77,19 +121,19 @@ import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver";
   instead of a generic value like `string`
 */
 const schema = object({
-  common: equals(["common"]),
-  a: equals(["a", "b"] as const),
+  common: equals(["common"]).defined(),
+  a: equals(["a", "b"] as const).defined(),
 })
   .union((v) => {
     if (v.a === "a") {
       return {
-        a: equals(["a"] as const),
-        c: equals([0]),
+        a: equals(["a"] as const).defined(),
+        c: equals([0]).defined(),
       };
     } else {
       return {
-        a: equals(["b"] as const),
-        d: equals([false]),
+        a: equals(["b"] as const).defined(),
+        d: equals([false]).defined(),
       };
     }
   })

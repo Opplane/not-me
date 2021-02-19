@@ -29,6 +29,6 @@ export class EqualsSchema<
 export function equals<PossibleValues extends readonly unknown[]>(
   possibleValues: PossibleValues,
   message?: string
-) {
+): EqualsSchema<PossibleValues> {
   return new EqualsSchema<PossibleValues>(possibleValues, message);
 }
