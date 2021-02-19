@@ -32,7 +32,7 @@
 
 ## Motivation behind this package
 
-This package was built in order to fix some shortcomings (specially with _type safety_) that many validation libraries have. Most validation libraries try to do a lot, and their code starts getting confusing and with a lot of back and forths. As consequence, unsolved Github issues start pilling up, improving the libraries ourselves becomes hard since there are too many flows and a lot of history behind them, and a lot of broad types (like `any` or `object`) start surfacing and undermining the _type safety_ of a project.
+This package was built in order to fix some shortcomings (specially with _type safety_) that many validation libraries have. Most validation libraries try to do a lot, and their code starts getting confusing and with a lot of back and forths. As consequence, unsolved Github issues start pilling up, improving or extending the libraries ourselves becomes hard since there are too many flows with some history behind them, and a lot of broad types (like `any` or `object`) start surfacing and undermining the _type safety_ of a project.
 
 Having a separate type and a schema for each entity is also not a viable solution, since if one of them is changed, the developer has to remember to update the other one too, and that opens doors to human error.
 
