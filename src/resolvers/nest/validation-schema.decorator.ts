@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { SetMetadata } from "@nestjs/common";
 import { Schema } from "../../schemas/schema";
 

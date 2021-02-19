@@ -205,6 +205,7 @@ export abstract class BaseSchema<
         } else {
           continue;
         }
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (valueFilter.type === FilterType.Transform) {
         value = valueFilter.filterFn(value);
         continue;
@@ -239,7 +240,7 @@ export abstract class BaseSchema<
     return this as any;
   }
 
-  protected addShapeFilter(filterFn: ShapeFilter<BaseType>["filterFn"]) {
+  protected addShapeFilter(filterFn: ShapeFilter<BaseType>["filterFn"]): void {
     this.shapeFilters.push({
       type: FilterType.Shape,
       filterFn,
@@ -249,7 +250,7 @@ export abstract class BaseSchema<
   private addTestFilter(
     filterFn: (value: Shape) => boolean,
     getMessage: () => string
-  ) {
+  ): void {
     this.valueFilters.push({
       type: FilterType.Test,
       filterFn,
@@ -259,7 +260,7 @@ export abstract class BaseSchema<
 
   private addTransformFilter(
     filterFn: TransformFilter<Shape, any>["filterFn"]
-  ) {
+  ): void {
     this.valueFilters.push({
       type: FilterType.Transform,
       filterFn,

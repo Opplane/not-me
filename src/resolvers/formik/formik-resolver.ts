@@ -31,10 +31,7 @@ export function formikResolver<S extends FormikFormSchema>(schema: S) {
     const result = schema.validate(values);
 
     if (result.errors) {
-      if (
-        result.messagesTree instanceof Array ||
-        result.messagesTree === undefined
-      ) {
+      if (result.messagesTree instanceof Array) {
         return undefined;
       } else {
         return traverseErrorMessagesTree<InferType<S>>(result.messagesTree);

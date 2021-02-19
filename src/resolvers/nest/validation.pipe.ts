@@ -15,7 +15,7 @@ import {
 export class NotMeValidationPipe implements PipeTransform<unknown> {
   constructor(private readonly reflector: Reflector) {}
 
-  transform(value: unknown, metadata: ArgumentMetadata) {
+  transform(value: unknown, metadata: ArgumentMetadata): unknown {
     const metatype =
       metadata.metatype ||
       throwError(

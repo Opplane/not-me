@@ -37,6 +37,7 @@ function getDeeperTypesafeObjectFieldPath<T>(previousRecursionPath: string) {
 */
 export function getTypesafeObjectFieldPath<T>(
   // Infer generic from argument, if any, to avoid having to pass a generic type manually
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _values?: T
 ): Pick<TypesafeObjectFieldPathPointer<T>, "and"> {
   return {

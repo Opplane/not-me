@@ -34,7 +34,7 @@ export class NumberSchema extends BaseSchema<number> {
     });
   }
 
-  integer(message?: string) {
+  integer(message?: string): this {
     this.test(
       (input) => Number.isInteger(input),
       () =>
@@ -48,6 +48,6 @@ export class NumberSchema extends BaseSchema<number> {
   }
 }
 
-export function number(message?: string) {
+export function number(message?: string): NumberSchema {
   return new NumberSchema(message);
 }
