@@ -25,7 +25,8 @@
     "lint": "npm run eslint -- --fix",
     "lint:no-fix": "npm run eslint",
     "precommit": "lint-staged && npm run lint:no-fix && npm run typecheck",
-    "npm-check-updates": "npm-check-updates"
+    "npm-check-updates": "npm-check-updates",
+    "prepublish": "npm run test && npm run build"
   },
   "author": "Opplane",
   "license": "MIT",
