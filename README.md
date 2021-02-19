@@ -34,15 +34,13 @@
 
 This package was built in order to fix some shortcomings (specially with _type safety_) that many validation libraries have. Most validation libraries try to do a lot, and their code starts getting confusing and with a lot of back and forths. As consequence, unsolved Github issues start pilling up, improving or extending the libraries ourselves becomes hard since there are too many flows with some history behind them, and a lot of broad types (like `any` or `object`) start surfacing and undermining the _type safety_ of a project.
 
-Having a separate type and a schema for each entity is also not a viable solution, since if one of them is changed, the developer has to remember to update the other one too, and that opens doors to human error.
-
 Our take on validation with `not-me` is almost to provide you with enough boilerplate for you to build your own validations schemas. This way, it's easy to maintain and improve this package.
 
 ## How to use it
 
 ### Imports:
 
-Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not provide tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
+Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
 ### Type utilities (at `not-me/lib/schemas/schema`):
 
