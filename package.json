@@ -1,6 +1,6 @@
 {
   "name": "@opplane/not-me",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Easy and type-safe validation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -27,7 +27,7 @@
     "lint:no-fix": "npm run eslint",
     "precommit": "lint-staged && npm run lint:no-fix && npm run typecheck",
     "npm-check-updates": "npm-check-updates",
-    "prepublish": "npm run test && npm run build"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "author": "Opplane",
   "license": "MIT",
