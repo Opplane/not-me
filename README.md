@@ -48,6 +48,29 @@ npm install @opplane/not-me
 
 Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
+### Building schemas:
+
+This library offers the following basic types for you to build more complex validation schemas:
+
+- `array([...allowed elements schemas])`
+- `base()` - all schemas extend from this one. It accepts a broad base type (like `object`) and a more precise shape type (like `{ a: number }`) as generics
+- `boolean()`
+- `date()`
+- `equals([...allowed values])`
+- `number()`
+- `object({ property: schemaForTheProperty })`
+- `objectOf([...allowed values schemas])` - same as `object()` but for values where the key can be any string
+- `string()`
+
+With these basic blocks, you can build more complex validations, by chaining...
+
+- `test((v) => <condition>)` - will validate if your value matches a condition
+- `transform((v) => <transform input value into any other value>)` - will allow you to modify the input value
+- `defined()` - sets the schema to reject `undefined` values
+- `nullable()` - sets the schema to accept `null` values
+
+All these methods except `transform` have a last parameter that allows you to set a customized error message for when the value fails to meet the conditions. The methods above are all inherited from the `base()` schema. Other schemas might provide their own helpful methods, like `string()` provides `string().filled()`, a method that makes sure the field is filled not just with blank spaces.
+
 ### Type utilities (at `not-me/lib/schemas/schema`):
 
 - **`InferType<typeof schema>`**: get the output type of a schema
@@ -96,11 +119,11 @@ By integrating this resolver with your NestJS project, arguments annotated with 
 
 - `any-data.dto.ts`
 
-  > Tie both the DTO type and the schema type by either **typing the schema with the DTO class** or **implementing the schema's inferred type**
+  > Tie both the DTO class and the schema type by either **typing the schema with the DTO class** or **implementing the schema's inferred type**
 
-  - **Typing the schema with the class of the value being validated**
+  - **Typing the schema with the DTO class**
 
-    > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object.
+    > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object. When using this method, **the class should be considered the _source of truth_**.
 
     ```typescript
     import { object } from "not-me/lib/schemas/object/object-schema";
@@ -120,7 +143,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
 
   - **Implementing the schema's inferred type**
 
-    > Some usecases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**.
+    > Some use cases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**. When using this method, **the schema should be considered the _source of truth_**.
 
     ```typescript
     import { object } from "not-me/lib/schemas/object/object-schema";
@@ -172,11 +195,10 @@ const schema = object({
 
 When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. There are 3 types of filter functions, and they run in this order:
 
+- **Nullability checks** will check if the value is `undefined` or `null` and whether or not their allowed
 - **Type filter** will validate if your input is in a specific type (example: a number, an object, an array, etc...)
 - **Shape filters** will validate the fields in your value. This only applies to object and array values
-- **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value
-
-You should also define what kind of nullable values you want to be able to get throught at the end of the schema chain, by calling `nullable()` or `defined()`.
+- **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value.
 
 ### Creating a schema of my own:
 

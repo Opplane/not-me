@@ -2,9 +2,7 @@ import { DefaultErrorMessagesManager } from "../../error-messages/default-messag
 import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { ValidationResult, InferType, Schema } from "../schema";
-import { objectTypeFilter } from "./object-type-filter";
-
-type BaseType = { [key: string]: unknown };
+import { BaseType, objectTypeFilter } from "./object-type-filter";
 
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
 
