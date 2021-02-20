@@ -38,6 +38,12 @@ Our take on validation with `not-me` is almost to provide you with enough boiler
 
 ## How to use it
 
+### Installing:
+
+```
+npm install @opplane/not-me
+```
+
 ### Imports:
 
 Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
@@ -90,23 +96,47 @@ By integrating this resolver with your NestJS project, arguments annotated with 
 
 - `any-data.dto.ts`
 
-  > Tie both the DTO type and the schema type by **implementing the schema's inferred type**
+  > Tie both the DTO type and the schema type by either **typing the schema with the DTO class** or **implementing the schema's inferred type**
 
-  ```typescript
-  import { object } from "not-me/lib/schemas/object/object-schema";
-  import { string } from "not-me/lib/schemas/string/string-schema";
-  import { InferType } from "not-me/lib/schemas/schema";
-  import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+  - **Typing the schema with the class of the value being validated**
 
-  const schema = object({
-    field: string().required(),
-  });
+    > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object.
 
-  @ValidationSchema(schema)
-  export class AnyDataDTO implements InferType<typeof schema> {
-    field: string;
-  }
-  ```
+    ```typescript
+    import { object } from "not-me/lib/schemas/object/object-schema";
+    import { string } from "not-me/lib/schemas/string/string-schema";
+    import { Schema } from "not-me/lib/schemas/schema";
+    import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+
+    const schema: Schema<AnyDataDTO> = object({
+      field: string().required(),
+    });
+
+    @ValidationSchema(schema)
+    export class AnyDataDTO {
+      field: string;
+    }
+    ```
+
+  - **Implementing the schema's inferred type**
+
+    > Some usecases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**.
+
+    ```typescript
+    import { object } from "not-me/lib/schemas/object/object-schema";
+    import { string } from "not-me/lib/schemas/string/string-schema";
+    import { InferType } from "not-me/lib/schemas/schema";
+    import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+
+    const schema = object({
+      field: string().required(),
+    });
+
+    @ValidationSchema(schema)
+    export class AnyDataDTO implements InferType<typeof schema> {
+      field: string;
+    }
+    ```
 
 ### Union typed schemas:
 
