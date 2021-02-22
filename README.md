@@ -137,9 +137,9 @@ export function integer(message?: string) {
 }
 ```
 
-### Form library resolvers:
+### Library resolvers / adapters:
 
-This package includes validation resolvers to work with the following form libraries:
+This package includes validation resolvers to work with the following libraries / frameworks:
 
 - [Formik](#formik)
 - [Nest](#nest)
