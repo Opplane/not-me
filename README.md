@@ -46,7 +46,9 @@ npm install @opplane/not-me
 
 ### Imports:
 
-Keeping an app's code splitted into small lazy-loaded chunks is a priority for frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
+> Most IDEs and Javascript text editors (like _Visual Studio Code_) import modules automatically just by starting to write the name of the value you want to use.
+
+Keeping an app's code splitted into small lazy-loaded chunks is a priority in frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
 
 ### Building schemas:
 
@@ -71,10 +73,69 @@ With these basic blocks, you can build more complex validations, by chaining...
 
 All these methods except `transform` have a last parameter that allows you to set a customized error message for when the value fails to meet the conditions. The methods above are all inherited from the `base()` schema. Other schemas might provide their own helpful methods, like `string()` provides `string().filled()`, a method that makes sure the field is filled not just with blank spaces.
 
+### Union typed schemas:
+
+```typescript
+/*
+  schema will output
+  { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
+
+  `as const` statements are needed to infer the literal value (like 'a' | 'b')
+  instead of a generic value like `string`
+*/
+const schema = object({
+  common: equals(["common"]).defined(),
+  a: equals(["a", "b"] as const).defined(),
+})
+  .union((v) => {
+    if (v.a === "a") {
+      return {
+        a: equals(["a"] as const).defined(),
+        c: equals([0]).defined(),
+      };
+    } else {
+      return {
+        a: equals(["b"] as const).defined(),
+        d: equals([false]).defined(),
+      };
+    }
+  })
+  .defined();
+```
+
 ### Type utilities (at `not-me/lib/schemas/schema`):
 
 - **`InferType<typeof schema>`**: get the output type of a schema
 - **`Schema<T>`**: dictates that a value is a schema that has an output type of `T`
+
+### Creating a schema of my own:
+
+Just extend the class of the closest schema there is for your type of value, and call the `transform()` and `test()` methods in your new schema to setup the validation logic that will be run. Can be either in it's _constructor_, or you can add new methods to your schema.
+
+- Here's how an Integer Schema could be implemented:
+
+```typescript
+import { NumberSchema } from "not-me/lib/schemas/number/number-schema";
+
+class IntegerSchema extends NumberSchema {
+  constructor(message?: string) {
+    super();
+
+    this.test(
+      (input) => Number.isInteger(input),
+      message || "Input is not an integer"
+    );
+  }
+}
+
+/*
+  Just a wrapper function so you don't have to write `new IntegerSchema()`.
+  It's more readable if you just call `integer()` inside a complex schema.
+*/
+export function integer(message?: string) {
+  return new IntegerSchema(message);
+}
+```
 
 ### Form library resolvers:
 
@@ -161,70 +222,11 @@ By integrating this resolver with your NestJS project, arguments annotated with 
     }
     ```
 
-### Union typed schemas:
-
-```typescript
-/*
-  schema will output
-  { common: string } & ({ a: "a"; c: number } | { a: "b"; d: boolean })
-
-  `as const` statements are needed to infer the literal value (like 'a' | 'b')
-  instead of a generic value like `string`
-*/
-const schema = object({
-  common: equals(["common"]).defined(),
-  a: equals(["a", "b"] as const).defined(),
-})
-  .union((v) => {
-    if (v.a === "a") {
-      return {
-        a: equals(["a"] as const).defined(),
-        c: equals([0]).defined(),
-      };
-    } else {
-      return {
-        a: equals(["b"] as const).defined(),
-        d: equals([false]).defined(),
-      };
-    }
-  })
-  .defined();
-```
-
 ### How it works under the hood:
 
-When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. There are 3 types of filter functions, and they run in this order:
+When you set up a schema, you're just pilling up filter functions that will test and transform your initial value. These are the types of filters that are called during validation, by this order:
 
-- **Nullability checks** will check if the value is `undefined` or `null` and whether or not their allowed
+- **Nullability checks** will check if the value is `undefined` or `null` and whether or not they're allowed
 - **Type filter** will validate if your input is in a specific type (example: a number, an object, an array, etc...)
 - **Shape filters** will validate the fields in your value. This only applies to object and array values
 - **Test and Transform filters** will run basic _true_ or _false_ checks on your value, or transform your value.
-
-### Creating a schema of my own:
-
-Just extend the class of the closest schema there is for your type of value, and call the `transform()` and `test()` methods in your new schema to setup the validation logic that will be run. Can be either in it's _constructor_, or you can add new methods to your schema.
-
-- Here's how an Integer Schema could be implemented:
-
-```typescript
-import { NumberSchema } from "not-me/lib/schemas/number/number-schema";
-
-class IntegerSchema extends NumberSchema {
-  constructor(message?: string) {
-    super();
-
-    this.test(
-      (input) => Number.isInteger(input),
-      message || "Input is not an integer"
-    );
-  }
-}
-
-/*
-  Just a wrapper function so you don't have to write `new IntegerSchema()`.
-  It's more readable if you just call `integer()` inside a complex schema.
-*/
-export function integer(message?: string) {
-  return new IntegerSchema(message);
-}
-```
