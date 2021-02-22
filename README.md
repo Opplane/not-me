@@ -61,7 +61,7 @@ This library offers the following basic types for you to build more complex vali
 - `equals([...allowed values])`
 - `number()`
 - `object({ property: schemaForTheProperty })`
-- `objectOf([...allowed values schemas])` - same as `object()` but for values where the key can be any string
+- `objectOf([...allowed values schemas])` - same as `object()` but for objects whose keys can be any string
 - `string()`
 
 With these basic blocks, you can build more complex validations, by chaining...
