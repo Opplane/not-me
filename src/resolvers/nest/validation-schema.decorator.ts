@@ -8,9 +8,7 @@ export const VALIDATION_SCHEMA_KEY = "not-me-validation-schema";
 /*
   
 */
-export type SupportedValidationSchema = Schema<
-  unknown[] | { [key: string]: unknown }
->;
+export type SupportedValidationSchema = Schema<object>;
 
 /**
  * Schema must be an array or an object marked with .defined().
