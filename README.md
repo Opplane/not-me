@@ -184,7 +184,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
 
   - **Typing the schema with the DTO class**
 
-    > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object. When using this method, **the class should be considered the _source of truth_**.
+    > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object. When using this method, **the class should be the first place you go to add, change or remove properties**.
 
     ```typescript
     import { object } from "not-me/lib/schemas/object/object-schema";
@@ -204,7 +204,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
 
   - **Implementing the schema's inferred type**
 
-    > Some use cases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**. When using this method, **the schema should be considered the _source of truth_**.
+    > Some use cases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**. When using this method, **the schema should be the first place you go to add, change or remove properties**.
 
     ```typescript
     import { object } from "not-me/lib/schemas/object/object-schema";
