@@ -125,15 +125,15 @@ export class ArraySchema<
     });
   }
 
-  min(lenght: number, message?: string): this {
-    this.minLength = lenght;
+  min(length: number, message?: string): this {
+    this.minLength = length;
     this.minLengthMessage = message;
 
     return this;
   }
 
-  max(lenght: number, message?: string): this {
-    this.maxLength = lenght;
+  max(length: number, message?: string): this {
+    this.maxLength = length;
     this.maxLengthMessage = message;
 
     return this;
