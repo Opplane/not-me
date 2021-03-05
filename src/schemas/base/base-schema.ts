@@ -78,14 +78,9 @@ export abstract class BaseSchema<
     input: unknown,
     options: ValidationOptions = undefined
   ): ValidationResult<InferType<this>> {
-    if (input === undefined) {
-      if (this.defaultValue !== undefined) {
-        return {
-          errors: false,
-          value: this.defaultValue,
-        };
-      }
+    const _input = input === undefined ? this.defaultValue : input;
 
+    if (_input === undefined) {
       if (!this.allowUndefined) {
         return {
           errors: true,
@@ -99,12 +94,12 @@ export abstract class BaseSchema<
       } else {
         return {
           errors: false,
-          value: input as any,
+          value: _input as any,
         };
       }
     }
 
-    if (input === null) {
+    if (_input === null) {
       if (!this.allowNull) {
         return {
           errors: true,
@@ -117,7 +112,7 @@ export abstract class BaseSchema<
       } else {
         return {
           errors: false,
-          value: input as any,
+          value: _input as any,
         };
       }
     }
@@ -125,7 +120,7 @@ export abstract class BaseSchema<
     /*
       BASE TYPE FILTER
     */
-    let typedValue = input;
+    let typedValue = _input;
 
     const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
 
