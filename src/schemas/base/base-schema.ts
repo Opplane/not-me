@@ -66,7 +66,6 @@ export abstract class BaseSchema<
   private isNullMessage?: string;
   private allowUndefined = true;
   private isUndefinedMessage?: string;
-  private defaultValue?: InferType<this>;
 
   protected mapMode?: boolean;
 
@@ -81,7 +80,7 @@ export abstract class BaseSchema<
     input: unknown,
     options: ValidationOptions = undefined
   ): ValidationResult<InferType<this>> {
-    let _currentValue = input === undefined ? this.defaultValue : input;
+    let _currentValue = input;
 
     if (_currentValue === undefined && !this.allowUndefined) {
       return {
@@ -258,7 +257,7 @@ export abstract class BaseSchema<
   test(
     testFunction: (value: InferType<this>) => boolean,
     message: string | (() => string)
-  ): this {
+  ): Schema<InferType<this>> {
     this.addTestFilter(
       testFunction,
       typeof message === "string" ? () => message : message
@@ -272,11 +271,5 @@ export abstract class BaseSchema<
     this.addTransformFilter(transformFunction);
 
     return this as any;
-  }
-
-  default(value: InferType<this>): this {
-    this.defaultValue = value;
-
-    return this;
   }
 }

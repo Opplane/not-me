@@ -73,6 +73,15 @@ With these basic blocks, you can build more complex validations, by chaining...
 
 All these methods except `transform` have a last parameter that allows you to set a customized error message for when the value fails to meet the conditions. The methods above are all inherited from the `base()` schema. Other schemas might provide their own helpful methods, like `string()` provides `string().filled()`, a method that makes sure the field is filled not just with blank spaces.
 
+Typescript will guide you in the recommended order by which you should chain validations. But if you use pure Javascript, we recommend you to chain schemas in this order:
+
+- Type validations (like `number()`, `string()`, etc...)
+- Schema specific validations (like `filled()`, `union()`, etc...)
+- Nullability validations (`defined()` and `nullable()`)
+- Test and Transform validations (`test()` and `transform()`)
+
+If you follow what auto-complete presents to you, you should be fine.
+
 ### Union typed schemas:
 
 ```typescript
