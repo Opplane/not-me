@@ -36,7 +36,13 @@ export class StringSchema<
    */
   filled(message?: string): StringSchema<never> {
     this.test(
-      (input) => input.trim().length > 0,
+      (input) => {
+        if (!input) {
+          return false;
+        }
+
+        return input.trim().length > 0;
+      },
       () =>
         message ||
         DefaultErrorMessagesManager.getDefaultMessages()?.string?.notAString ||

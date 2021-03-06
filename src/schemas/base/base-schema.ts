@@ -44,6 +44,10 @@ type TransformFilter<V, R> = {
   filterFn: (value: V) => R;
 };
 
+function isNullable(input: unknown): input is undefined | null {
+  return input === undefined || input === null;
+}
+
 export abstract class BaseSchema<
   BaseType,
   Shape extends BaseType = BaseType,
@@ -55,9 +59,8 @@ export abstract class BaseSchema<
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
-  private valueFilters: Array<
-    TestFilter<Shape> | TransformFilter<any, any>
-  > = [];
+  private testFilters: Array<TestFilter<InferType<this>>> = [];
+  private transformFilters: Array<TransformFilter<InferType<this>, any>> = [];
 
   private allowNull = false;
   private isNullMessage?: string;
@@ -78,148 +81,138 @@ export abstract class BaseSchema<
     input: unknown,
     options: ValidationOptions = undefined
   ): ValidationResult<InferType<this>> {
-    const _input = input === undefined ? this.defaultValue : input;
+    let _currentValue = input === undefined ? this.defaultValue : input;
 
-    if (_input === undefined) {
-      if (!this.allowUndefined) {
-        return {
-          errors: true,
-          messagesTree: [
-            this.isUndefinedMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.base
-                ?.isUndefined ||
-              "Input is not defined",
-          ],
-        } as this["_rejectedValueValidationResult"];
-      } else {
-        return {
-          errors: false,
-          value: _input as any,
-        };
-      }
+    if (_currentValue === undefined && !this.allowUndefined) {
+      return {
+        errors: true,
+        messagesTree: [
+          this.isUndefinedMessage ||
+            DefaultErrorMessagesManager.getDefaultMessages()?.base
+              ?.isUndefined ||
+            "Input is not defined",
+        ],
+      } as this["_rejectedValueValidationResult"];
     }
 
-    if (_input === null) {
-      if (!this.allowNull) {
-        return {
-          errors: true,
-          messagesTree: [
-            this.isNullMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
-              "Input is null",
-          ],
-        } as this["_rejectedValueValidationResult"];
-      } else {
-        return {
-          errors: false,
-          value: _input as any,
-        };
-      }
+    if (_currentValue === null && !this.allowNull) {
+      return {
+        errors: true,
+        messagesTree: [
+          this.isNullMessage ||
+            DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
+            "Input is null",
+        ],
+      } as this["_rejectedValueValidationResult"];
     }
 
-    /*
+    if (!isNullable(_currentValue)) {
+      /*
       BASE TYPE FILTER
     */
-    let typedValue = _input;
+      let typedValue = _currentValue;
 
-    const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
+      const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
 
-    if (typeFilterResponse.errors) {
-      return typeFilterResponse as any;
-    } else {
-      typedValue = typeFilterResponse.value;
-    }
+      if (typeFilterResponse.errors) {
+        return typeFilterResponse as any;
+      } else {
+        typedValue = typeFilterResponse.value;
+      }
 
-    /*
+      /*
       SHAPE FILTERS
     */
 
-    let shapedValue: BaseType;
+      let shapedValue: BaseType;
 
-    if (this.mapMode) {
-      shapedValue = {} as BaseType;
-      let shapedValueWithUnknownProperties = typedValue as BaseType;
+      if (this.mapMode) {
+        shapedValue = {} as BaseType;
+        let shapedValueWithUnknownProperties = typedValue as BaseType;
 
-      for (let i = 0; i < this.shapeFilters.length; i++) {
-        const shapeFilter = this.shapeFilters[i] || throwError();
+        for (let i = 0; i < this.shapeFilters.length; i++) {
+          const shapeFilter = this.shapeFilters[i] || throwError();
 
-        const filterRes = shapeFilter.filterFn(
-          shapedValueWithUnknownProperties,
-          options
-        );
-
-        if (filterRes.errors) {
-          return filterRes as this["_rejectedValueValidationResult"];
-        } else {
-          shapedValue = Object.assign(shapedValue, filterRes.value);
-          shapedValueWithUnknownProperties = Object.assign(
+          const filterRes = shapeFilter.filterFn(
             shapedValueWithUnknownProperties,
-            filterRes.value
+            options
           );
+
+          if (filterRes.errors) {
+            return filterRes as this["_rejectedValueValidationResult"];
+          } else {
+            shapedValue = Object.assign(shapedValue, filterRes.value);
+            shapedValueWithUnknownProperties = Object.assign(
+              shapedValueWithUnknownProperties,
+              filterRes.value
+            );
+          }
+        }
+      } else {
+        shapedValue = typedValue as BaseType;
+
+        for (let i = 0; i < this.shapeFilters.length; i++) {
+          const shapeFilter = this.shapeFilters[i] || throwError();
+
+          const filterRes = shapeFilter.filterFn(shapedValue, options);
+
+          if (filterRes.errors) {
+            return filterRes as this["_rejectedValueValidationResult"];
+          } else {
+            shapedValue = filterRes.value;
+          }
         }
       }
-    } else {
-      shapedValue = typedValue as BaseType;
 
-      for (let i = 0; i < this.shapeFilters.length; i++) {
-        const shapeFilter = this.shapeFilters[i] || throwError();
-
-        const filterRes = shapeFilter.filterFn(shapedValue, options);
-
-        if (filterRes.errors) {
-          return filterRes as this["_rejectedValueValidationResult"];
-        } else {
-          shapedValue = filterRes.value;
-        }
-      }
+      _currentValue = shapedValue;
     }
 
     /*
-      VALUE FILTERS
+      TEST FILTERS
     */
-    let value = shapedValue as Shape;
+    let testFiltersErrors: string[] = [];
 
-    let valueFilterErrors: string[] = [];
+    for (const testFilter of this.testFilters) {
+      const valid = testFilter.filterFn(_currentValue as InferType<this>);
 
-    for (const valueFilter of this.valueFilters) {
-      if (valueFilter.type === FilterType.Test) {
-        const valid = valueFilter.filterFn(value);
+      if (!valid) {
+        const messages = [testFilter.getMessage()];
 
-        if (!valid) {
-          const messages = [valueFilter.getMessage()];
-
-          if (options?.abortEarly) {
-            return {
-              errors: true,
-              messagesTree: messages as this["_rejectedValueValidationResult"]["messagesTree"],
-            };
-          } else {
-            valueFilterErrors = [...valueFilterErrors, ...messages];
-            continue;
-          }
+        if (options?.abortEarly) {
+          return {
+            errors: true,
+            messagesTree: messages as this["_rejectedValueValidationResult"]["messagesTree"],
+          };
         } else {
+          testFiltersErrors = [...testFiltersErrors, ...messages];
           continue;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      } else if (valueFilter.type === FilterType.Transform) {
-        value = valueFilter.filterFn(value);
+      } else {
         continue;
       }
-
-      throw new Error();
     }
 
-    if (valueFilterErrors.length > 0) {
+    if (testFiltersErrors.length > 0) {
       return {
         errors: true,
-        messagesTree: valueFilterErrors,
+        messagesTree: testFiltersErrors,
       } as this["_rejectedValueValidationResult"];
-    } else {
-      return {
-        errors: false,
-        value,
-      };
     }
+
+    /*
+      TRANSFORM FILTERS
+    */
+
+    for (const transformFilter of this.transformFilters) {
+      _currentValue = transformFilter.filterFn(
+        _currentValue as InferType<this>
+      );
+    }
+
+    return {
+      errors: false,
+      value: _currentValue,
+    } as this["_acceptedValueValidationResult"];
   }
 
   nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
@@ -243,10 +236,10 @@ export abstract class BaseSchema<
   }
 
   private addTestFilter(
-    filterFn: (value: Shape) => boolean,
+    filterFn: (value: InferType<this>) => boolean,
     getMessage: () => string
   ): void {
-    this.valueFilters.push({
+    this.testFilters.push({
       type: FilterType.Test,
       filterFn,
       getMessage,
@@ -254,16 +247,16 @@ export abstract class BaseSchema<
   }
 
   private addTransformFilter(
-    filterFn: TransformFilter<Shape, any>["filterFn"]
+    filterFn: TransformFilter<InferType<this>, any>["filterFn"]
   ): void {
-    this.valueFilters.push({
+    this.transformFilters.push({
       type: FilterType.Transform,
       filterFn,
     });
   }
 
   test(
-    testFunction: (value: Shape) => boolean,
+    testFunction: (value: InferType<this>) => boolean,
     message: string | (() => string)
   ): this {
     this.addTestFilter(
@@ -273,14 +266,10 @@ export abstract class BaseSchema<
     return this;
   }
 
-  transform<TransformFunction extends (value: Shape) => unknown>(
-    testFunction: TransformFunction
-  ): BaseSchema<
-    ReturnType<TransformFunction>,
-    ReturnType<TransformFunction>,
-    NT
-  > {
-    this.addTransformFilter(testFunction);
+  transform<TransformFunction extends (value: InferType<this>) => unknown>(
+    transformFunction: TransformFunction
+  ): Schema<ReturnType<TransformFunction>> {
+    this.addTransformFilter(transformFunction);
 
     return this as any;
   }
