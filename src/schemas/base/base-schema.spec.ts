@@ -6,8 +6,8 @@ describe("Base Schema", () => {
     const schema = object({
       a: number()
         .integer()
-        .test((v) => v < 1000, "Must be smaller than 1000")
-        .defined(),
+        .defined()
+        .test((v) => v < 1000, "Must be smaller than 1000"),
     }).defined();
 
     expect(schema.validate({ a: 1000.1 })).toEqual({
@@ -22,8 +22,8 @@ describe("Base Schema", () => {
     const schema = object({
       a: number()
         .integer()
-        .test((v) => v < 1000, "Must be smaller than 1000")
-        .defined(),
+        .defined()
+        .test((v) => v < 1000, "Must be smaller than 1000"),
     }).defined();
 
     expect(schema.validate({ a: 1000.1 }, { abortEarly: true })).toEqual({
