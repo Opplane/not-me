@@ -26,6 +26,8 @@ describe("Formik resolver", () => {
       value: unknown
     ) => void | FormikErrors<InferType<typeof schema>> = formikResolver(schema);
 
-    expect(resolver({ a: "not a number" })).toEqual({ a: expect.any(String) });
+    expect(resolver({ a: "not a number" })).toEqual({
+      a: expect.any(String) as unknown,
+    });
   });
 });

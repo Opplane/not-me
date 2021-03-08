@@ -1,6 +1,6 @@
 {
   "name": "@opplane/not-me",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Easy and type-safe validation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,11 +21,11 @@
     "test:cov:changed": "npm run test:cov -- --onlyChanged",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:debug:watch": "npm run test:debug -- --watch",
-    "format": "prettier --write \"**/*.{js,jsx,json,ts,tsx,scss,sass,css,md}\"",
+    "format": "prettier --write .",
     "eslint": "eslint . --ext .ts --max-warnings 0",
     "lint": "npm run eslint -- --fix",
     "lint:no-fix": "npm run eslint",
-    "precommit": "lint-staged && npm run lint:no-fix && npm run typecheck",
+    "precommit": "lint-staged && npm run typecheck && npm run lint:no-fix",
     "npm-check-updates": "npm-check-updates",
     "prepublishOnly": "npm run test && npm run build"
   },
@@ -35,27 +35,27 @@
     "access": "public"
   },
   "dependencies": {
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@nestjs/common": "^7.6.12",
-    "@nestjs/core": "^7.6.12",
+    "@nestjs/common": "^7.6.13",
+    "@nestjs/core": "^7.6.13",
     "@types/jest": "^26.0.20",
     "@types/lodash": "^4.14.168",
-    "@types/react": "^17.0.2",
-    "@typescript-eslint/eslint-plugin": "4.14.2",
-    "@typescript-eslint/parser": "4.14.2",
-    "eslint": "7.19.0",
-    "eslint-config-prettier": "^7.2.0",
+    "@types/react": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "4.16.1",
+    "@typescript-eslint/parser": "4.16.1",
+    "eslint": "7.21.0",
+    "eslint-config-prettier": "^8.1.0",
     "formik": "^2.2.6",
     "glob": "^7.1.6",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
-    "npm-check-updates": "^11.1.1",
+    "npm-check-updates": "^11.2.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.1",
-    "typescript": "^4.1.5"
+    "ts-jest": "^26.5.3",
+    "typescript": "^4.2.3"
   },
   "jest": {
     "moduleFileExtensions": [

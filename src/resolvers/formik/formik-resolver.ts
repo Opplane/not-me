@@ -7,6 +7,7 @@ type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 function traverseErrorMessagesTree<T>(current: {
   [key: string]: AnyErrorMessagesTree;
 }): FormikErrors<T> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const convertedObj: FormikErrors<any> = {};
 
   for (const key in current) {
