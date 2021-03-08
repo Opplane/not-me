@@ -9,9 +9,9 @@ import {
 import { BaseType, objectTypeFilter } from "./object-type-filter";
 
 type SchemaObjToShape<
-  SchemasObj extends { [key: string]: Schema<any> | undefined }
+  SchemasObj extends { [key: string]: Schema<unknown> | undefined }
 > = {
-  [K in keyof SchemasObj]: SchemasObj[K] extends Schema<any>
+  [K in keyof SchemasObj]: SchemasObj[K] extends Schema<unknown>
     ? InferType<SchemasObj[K]>
     : never;
 };
@@ -59,10 +59,10 @@ export class ObjectSchema<
             errors: true,
             messagesTree: {
               [fieldKey]: fieldResult.messagesTree,
-            } as any,
+            },
           };
         } else {
-          errorsFieldsErrorMessages[fieldKey] = fieldResult.messagesTree as any;
+          errorsFieldsErrorMessages[fieldKey] = fieldResult.messagesTree;
         }
       } else {
         finalValue[fieldKey] = fieldResult.value;
@@ -96,6 +96,7 @@ export class ObjectSchema<
     >
   > {
     this.addShapeFilter((input, options) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const schema = schemaFactory(input as any);
 
       const result = this.validateObj(schema, input, options);
@@ -113,6 +114,7 @@ export class ObjectSchema<
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
 }

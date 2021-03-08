@@ -26,7 +26,7 @@ export class ObjectOfSchema<
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
-        let lastFieldResult: ValidationResult<any> | undefined = undefined;
+        let lastFieldResult: ValidationResult<unknown> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
           const result = schema.validate(fieldValue);

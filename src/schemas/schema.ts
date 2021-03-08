@@ -17,8 +17,7 @@ export type ValidationResult<Output> =
 export type ValidationOptions = { abortEarly?: boolean } | undefined;
 
 export type Schema<Output> = {
-  _rejectedValueValidationResult: RejectedValueValidationResult;
-  _acceptedValueValidationResult: AcceptedValueValidationResult<Output>;
+  _outputType: Output;
   validate(
     input: unknown,
     options?: ValidationOptions
@@ -32,6 +31,4 @@ export type Schema<Output> = {
   ): Schema<ReturnType<TransformFunction>>;
 };
 
-export type InferType<
-  S extends Schema<unknown>
-> = S["_acceptedValueValidationResult"]["value"];
+export type InferType<S extends Schema<unknown>> = S["_outputType"];

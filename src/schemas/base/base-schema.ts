@@ -53,14 +53,14 @@ export abstract class BaseSchema<
   Shape extends BaseType = BaseType,
   NT extends NullableTypes = DefaultNullableTypes
 > implements Schema<Shape | NT> {
-  _rejectedValueValidationResult!: RejectedValueValidationResult;
-  _acceptedValueValidationResult!: AcceptedValueValidationResult<Shape | NT>;
-  _nullableTypes!: NT;
+  _outputType!: Shape | NT;
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
   private testFilters: Array<TestFilter<InferType<this>>> = [];
-  private transformFilters: Array<TransformFilter<InferType<this>, any>> = [];
+  private transformFilters: Array<
+    TransformFilter<InferType<this>, unknown>
+  > = [];
 
   private allowNull = false;
   private isNullMessage?: string;
@@ -91,7 +91,7 @@ export abstract class BaseSchema<
               ?.isUndefined ||
             "Input is not defined",
         ],
-      } as this["_rejectedValueValidationResult"];
+      } as RejectedValueValidationResult;
     }
 
     if (_currentValue === null && !this.allowNull) {
@@ -102,7 +102,7 @@ export abstract class BaseSchema<
             DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
             "Input is null",
         ],
-      } as this["_rejectedValueValidationResult"];
+      } as RejectedValueValidationResult;
     }
 
     if (!isNullable(_currentValue)) {
@@ -114,7 +114,7 @@ export abstract class BaseSchema<
       const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
 
       if (typeFilterResponse.errors) {
-        return typeFilterResponse as any;
+        return typeFilterResponse;
       } else {
         typedValue = typeFilterResponse.value;
       }
@@ -138,7 +138,7 @@ export abstract class BaseSchema<
           );
 
           if (filterRes.errors) {
-            return filterRes as this["_rejectedValueValidationResult"];
+            return filterRes;
           } else {
             shapedValue = Object.assign(shapedValue, filterRes.value);
             shapedValueWithUnknownProperties = Object.assign(
@@ -156,7 +156,7 @@ export abstract class BaseSchema<
           const filterRes = shapeFilter.filterFn(shapedValue, options);
 
           if (filterRes.errors) {
-            return filterRes as this["_rejectedValueValidationResult"];
+            return filterRes;
           } else {
             shapedValue = filterRes.value;
           }
@@ -180,7 +180,7 @@ export abstract class BaseSchema<
         if (options?.abortEarly) {
           return {
             errors: true,
-            messagesTree: messages as this["_rejectedValueValidationResult"]["messagesTree"],
+            messagesTree: messages,
           };
         } else {
           testFiltersErrors = [...testFiltersErrors, ...messages];
@@ -195,7 +195,7 @@ export abstract class BaseSchema<
       return {
         errors: true,
         messagesTree: testFiltersErrors,
-      } as this["_rejectedValueValidationResult"];
+      };
     }
 
     /*
@@ -211,12 +211,13 @@ export abstract class BaseSchema<
     return {
       errors: false,
       value: _currentValue,
-    } as this["_acceptedValueValidationResult"];
+    } as AcceptedValueValidationResult<InferType<this>>;
   }
 
   nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
     this.allowNull = true;
     this.isNullMessage = message;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
   defined(
@@ -224,6 +225,7 @@ export abstract class BaseSchema<
   ): BaseSchema<BaseType, Shape, Exclude<NT, undefined>> {
     this.allowUndefined = false;
     this.isUndefinedMessage = message;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
 
@@ -246,7 +248,7 @@ export abstract class BaseSchema<
   }
 
   private addTransformFilter(
-    filterFn: TransformFilter<InferType<this>, any>["filterFn"]
+    filterFn: TransformFilter<InferType<this>, unknown>["filterFn"]
   ): void {
     this.transformFilters.push({
       type: FilterType.Transform,
@@ -270,6 +272,7 @@ export abstract class BaseSchema<
   ): Schema<ReturnType<TransformFunction>> {
     this.addTransformFilter(transformFunction);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
 }
