@@ -1,6 +1,6 @@
 {
   "name": "@opplane/not-me",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Easy and type-safe validation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
