@@ -57,15 +57,15 @@ export abstract class BaseSchema<
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
-  private testFilters: Array<TestFilter<InferType<this>>> = [];
-  private transformFilters: Array<
-    TransformFilter<InferType<this>, unknown>
+  private otherFilters: Array<
+    TestFilter<InferType<this>> | TransformFilter<InferType<this>, unknown>
   > = [];
 
   private allowNull = false;
-  private isNullMessage?: string;
+  private nullNotAllowedMessage?: string;
+
   private allowUndefined = true;
-  private isUndefinedMessage?: string;
+  private undefinedNotAllowedMessage?: string;
 
   protected mapMode?: boolean;
 
@@ -86,7 +86,7 @@ export abstract class BaseSchema<
       return {
         errors: true,
         messagesTree: [
-          this.isUndefinedMessage ||
+          this.undefinedNotAllowedMessage ||
             DefaultErrorMessagesManager.getDefaultMessages()?.base
               ?.isUndefined ||
             "Input is not defined",
@@ -98,7 +98,7 @@ export abstract class BaseSchema<
       return {
         errors: true,
         messagesTree: [
-          this.isNullMessage ||
+          this.nullNotAllowedMessage ||
             DefaultErrorMessagesManager.getDefaultMessages()?.base?.isNull ||
             "Input is null",
         ],
@@ -167,27 +167,31 @@ export abstract class BaseSchema<
     }
 
     /*
-      TEST FILTERS
+      OTHER FILTERS
     */
     let testFiltersErrors: string[] = [];
 
-    for (const testFilter of this.testFilters) {
-      const valid = testFilter.filterFn(_currentValue as InferType<this>);
+    for (const filter of this.otherFilters) {
+      if (filter.type === FilterType.Test) {
+        const valid = filter.filterFn(_currentValue as InferType<this>);
 
-      if (!valid) {
-        const messages = [testFilter.getMessage()];
+        if (!valid) {
+          const messages = [filter.getMessage()];
 
-        if (options?.abortEarly) {
-          return {
-            errors: true,
-            messagesTree: messages,
-          };
+          if (options?.abortEarly) {
+            return {
+              errors: true,
+              messagesTree: messages,
+            };
+          } else {
+            testFiltersErrors = [...testFiltersErrors, ...messages];
+            continue;
+          }
         } else {
-          testFiltersErrors = [...testFiltersErrors, ...messages];
           continue;
         }
       } else {
-        continue;
+        _currentValue = filter.filterFn(_currentValue as InferType<this>);
       }
     }
 
@@ -198,25 +202,19 @@ export abstract class BaseSchema<
       };
     }
 
-    /*
-      TRANSFORM FILTERS
-    */
-
-    for (const transformFilter of this.transformFilters) {
-      _currentValue = transformFilter.filterFn(
-        _currentValue as InferType<this>
-      );
-    }
-
     return {
       errors: false,
       value: _currentValue,
     } as AcceptedValueValidationResult<InferType<this>>;
   }
 
-  nullable(message?: string): BaseSchema<BaseType, Shape, NT | null> {
+  messageWhenNullIsRejected(message: string): this {
+    this.nullNotAllowedMessage = message;
+    return this;
+  }
+
+  nullable(): BaseSchema<BaseType, Shape, NT | null> {
     this.allowNull = true;
-    this.isNullMessage = message;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
@@ -224,7 +222,7 @@ export abstract class BaseSchema<
     message?: string
   ): BaseSchema<BaseType, Shape, Exclude<NT, undefined>> {
     this.allowUndefined = false;
-    this.isUndefinedMessage = message;
+    this.undefinedNotAllowedMessage = message;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
@@ -240,7 +238,7 @@ export abstract class BaseSchema<
     filterFn: (value: InferType<this>) => boolean,
     getMessage: () => string
   ): void {
-    this.testFilters.push({
+    this.otherFilters.push({
       type: FilterType.Test,
       filterFn,
       getMessage,
@@ -250,7 +248,7 @@ export abstract class BaseSchema<
   private addTransformFilter(
     filterFn: TransformFilter<InferType<this>, unknown>["filterFn"]
   ): void {
-    this.transformFilters.push({
+    this.otherFilters.push({
       type: FilterType.Transform,
       filterFn,
     });
