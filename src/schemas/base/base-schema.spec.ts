@@ -33,4 +33,16 @@ describe("Base Schema", () => {
       },
     });
   });
+
+  it("Send transformed value to chained validations that follow", () => {
+    const schema = number()
+      .integer()
+      .transform(() => true)
+      .test((v) => v === true, "Must be true");
+
+    expect(schema.validate(1, { abortEarly: true })).toEqual({
+      errors: false,
+      value: true,
+    });
+  });
 });

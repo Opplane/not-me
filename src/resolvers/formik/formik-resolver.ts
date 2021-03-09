@@ -15,7 +15,7 @@ function traverseErrorMessagesTree<T>(current: {
 
     if (prop instanceof Array) {
       convertedObj[key] = prop[0];
-    } else if (typeof prop === "object" && Object.keys(prop).length > 0) {
+    } else if (typeof prop === "object") {
       const convertedProp = traverseErrorMessagesTree(prop);
 
       convertedObj[key] = convertedProp;
