@@ -1,26 +1,19 @@
 import { BaseSchema } from "../base/base-schema";
 import { InferType, Schema } from "../schema";
 import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
+import { NullableTypes } from "../../utils/types/nullable-types";
 
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
-type BaseType = unknown;
 
 export class OrSchema<
   ValuesSchemas extends ValuesSchemasBase
-> extends BaseSchema<BaseType, InferType<ValuesSchemas[number]>> {
+> extends BaseSchema<Exclude<InferType<ValuesSchemas[number]>, NullableTypes>> {
   constructor(valuesSchemas: ValuesSchemas) {
-    super((input) => {
-      return {
-        errors: false,
-        value: input,
-      };
-    });
-
     if (valuesSchemas.length === 0) {
       throw new Error("No schemas were provided");
     }
 
-    this.addShapeFilter((input, options) => {
+    super((input, options) => {
       let acceptedResultValue: unknown;
       let isValid = false;
       const errorsFromSchemaIteration: AnyErrorMessagesTree[] = [];
@@ -41,7 +34,8 @@ export class OrSchema<
       if (isValid) {
         return {
           errors: false,
-          value: acceptedResultValue,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+          value: acceptedResultValue as any,
         };
       } else {
         return {
