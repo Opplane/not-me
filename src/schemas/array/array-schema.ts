@@ -1,7 +1,7 @@
 import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
 import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
-import { ValidationResult, InferType, Schema } from "../schema";
+import { InferType, Schema } from "../schema";
 
 type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
 type BaseType = unknown[];
@@ -15,11 +15,7 @@ export class ArraySchema<
   private maxLength = Infinity;
   private maxLengthMessage?: string;
 
-  constructor(
-    valuesSchemas: ValuesSchemas,
-    message?: string,
-    fieldDoesNotMatchMessage?: string
-  ) {
+  constructor(valuesSchemas: ValuesSchemas, message?: string) {
     super((input) => {
       if (input instanceof Array) {
         return {
@@ -38,6 +34,10 @@ export class ArraySchema<
         };
       }
     });
+
+    if (valuesSchemas.length === 0) {
+      throw new Error("No schemas were provided");
+    }
 
     this.addShapeFilter((input, options) => {
       const errors: { [key: number]: AnyErrorMessagesTree } = {};
@@ -69,45 +69,36 @@ export class ArraySchema<
       for (let index = 0; index < input.length; index++) {
         const element = input[index];
 
-        let lastFieldResult: ValidationResult<unknown> | undefined = undefined;
+        let acceptedResultValue: unknown;
+        let isValid = false;
+        const errorsFromSchemaIteration: AnyErrorMessagesTree = [];
 
         for (const schema of valuesSchemas) {
-          const result = schema.validate(element);
+          const result = schema.validate(element, options);
 
-          lastFieldResult = result;
-
-          if (!result.errors) {
+          if (result.errors) {
+            errorsFromSchemaIteration.push(result.messagesTree);
+            continue;
+          } else {
+            acceptedResultValue = result.value;
+            isValid = true;
             break;
           }
         }
 
-        if (!lastFieldResult) {
-          throw new Error("No schemas were provided");
-        }
-
-        if (lastFieldResult.errors) {
-          const messages =
-            valuesSchemas.length === 1
-              ? lastFieldResult.messagesTree
-              : [
-                  fieldDoesNotMatchMessage ||
-                    DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
-                      ?.fieldDoesNotMatch ||
-                    "Field did not match any of the provided schemas",
-                ];
-
+        if (isValid) {
+          validatedArray.push(acceptedResultValue);
+        } else {
           if (options?.abortEarly) {
             return {
               errors: true,
               messagesTree: {
-                [index]: messages,
+                [index]: errorsFromSchemaIteration,
               },
             };
           } else {
-            errors[index] = messages;
+            errors[index] = errorsFromSchemaIteration;
           }
-        } else {
-          validatedArray.push(lastFieldResult.value);
         }
       }
 
@@ -142,12 +133,7 @@ export class ArraySchema<
 
 export function array<ValuesSchemas extends ValuesSchemasBase>(
   valuesSchemas: ValuesSchemas,
-  message?: string,
-  fieldDoesNotMatchMessage?: string
+  message?: string
 ): ArraySchema<ValuesSchemas> {
-  return new ArraySchema<ValuesSchemas>(
-    valuesSchemas,
-    message,
-    fieldDoesNotMatchMessage
-  );
+  return new ArraySchema<ValuesSchemas>(valuesSchemas, message);
 }

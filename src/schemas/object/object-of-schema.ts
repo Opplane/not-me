@@ -29,7 +29,7 @@ export class ObjectOfSchema<
         let lastFieldResult: ValidationResult<unknown> | undefined = undefined;
 
         for (const schema of valuesSchemas) {
-          const result = schema.validate(fieldValue);
+          const result = schema.validate(fieldValue, options);
           lastFieldResult = result;
 
           if (!result.errors) {

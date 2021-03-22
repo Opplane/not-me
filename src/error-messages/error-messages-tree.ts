@@ -4,9 +4,8 @@ import {
 } from "../utils/get-typesafe-object-field-path";
 import lodashGet from "lodash/get";
 
-export type AnyErrorMessagesTree<IsRootOfTree extends true | false = false> =
-  | (IsRootOfTree extends true ? never : undefined)
-  | string[]
+export type AnyErrorMessagesTree =
+  | Array<string | AnyErrorMessagesTree>
   | { [key: string]: AnyErrorMessagesTree };
 
 export function getErrorMessagesFromField<Output>(
@@ -27,7 +26,7 @@ export function getErrorMessagesFromField<Output>(
   }
 
   if (node instanceof Array) {
-    return node;
+    return node.filter((n): n is string => typeof n === "string");
   } else {
     return undefined;
   }
