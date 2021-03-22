@@ -63,7 +63,7 @@ This library offers the following basic types for you to build more complex vali
 - `object({ property: schemaForTheProperty })`
 - `objectOf([...allowed values schemas])` - same as `object()` but for objects whose keys can be any string
 - `string()`
-- `or()` - the value is filtered throught multiple schemas till one matches. It's the equivalent to an _union type_
+- `or()` - the value is filtered through multiple schemas till one matches. It's the equivalent to an _union type_
 
 With these basic blocks, you can build more complex validations, by chaining...
 
