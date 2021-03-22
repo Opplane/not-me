@@ -6,8 +6,8 @@ import { or } from "./or-schema";
 describe("Or Schema", () => {
   it("Should match", () => {
     const schema: Schema<number | "string-literal"> = or([
-      number().defined(),
-      equals(["string-literal"] as const).defined(),
+      number(),
+      equals(["string-literal"] as const),
     ]).defined();
 
     const resultForNumber = schema.validate(2);
@@ -32,8 +32,8 @@ describe("Or Schema", () => {
 
   it("Should fail", () => {
     const schema: Schema<number | "string-literal"> = or([
-      number().defined(),
-      equals(["string-literal"] as const).defined(),
+      number(),
+      equals(["string-literal"] as const),
     ]).defined();
 
     const result = schema.validate("hello");

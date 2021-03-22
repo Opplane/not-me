@@ -22,15 +22,15 @@ enum FilterType {
 
 type BaseTypeFilter<BaseType> = {
   type: FilterType.BaseType;
-  filterFn: (input: unknown) => ValidationResult<BaseType>;
+  filterFn: (
+    input: unknown,
+    options: ValidationOptions
+  ) => ValidationResult<BaseType>;
 };
 
 type ShapeFilter<Type> = {
   type: FilterType.Shape;
-  filterFn: (
-    input: Type,
-    options: ValidationOptions | undefined
-  ) => ValidationResult<Type>;
+  filterFn: (input: Type, options: ValidationOptions) => ValidationResult<Type>;
 };
 
 type TestFilter<V> = {
@@ -111,7 +111,10 @@ export abstract class BaseSchema<
     */
       let typedValue = _currentValue;
 
-      const typeFilterResponse = this.baseTypeFilter.filterFn(typedValue);
+      const typeFilterResponse = this.baseTypeFilter.filterFn(
+        typedValue,
+        options
+      );
 
       if (typeFilterResponse.errors) {
         return typeFilterResponse;
