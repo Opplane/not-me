@@ -37,7 +37,7 @@ describe("Array Schema", () => {
     expect(schema.validate([undefined, undefined, { someProp: "c" }])).toEqual({
       errors: true,
       messagesTree: {
-        2: { someProp: ["Input is not equal to any of the allowed values"] },
+        2: [{ someProp: ["Input is not equal to any of the allowed values"] }],
       },
     });
   });

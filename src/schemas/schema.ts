@@ -2,7 +2,7 @@ import { AnyErrorMessagesTree } from "../error-messages/error-messages-tree";
 
 export type RejectedValueValidationResult = {
   errors: true;
-  messagesTree: AnyErrorMessagesTree<true>;
+  messagesTree: AnyErrorMessagesTree;
 };
 
 export type AcceptedValueValidationResult<Output> = {

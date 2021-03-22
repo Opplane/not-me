@@ -4,27 +4,49 @@ import { InferType, Schema } from "../../schemas/schema";
 
 type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 
-function traverseErrorMessagesTree<T>(current: {
+type TraversedFormErrors = string | TraversedFormErrorsObject;
+
+type TraversedFormErrorsObject = {
+  [key: string]: TraversedFormErrors | undefined;
+};
+
+function traverseErrorMessagesTree(formErrorMessagesTree: {
   [key: string]: AnyErrorMessagesTree;
-}): FormikErrors<T> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const convertedObj: FormikErrors<any> = {};
+}): TraversedFormErrorsObject {
+  const parseObject = (current: { [key: string]: AnyErrorMessagesTree }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parsed: TraversedFormErrorsObject = {};
 
-  for (const key in current) {
-    const prop = current[key];
+    Object.keys(current).forEach((key) => {
+      const field = formErrorMessagesTree[key];
 
-    if (prop instanceof Array) {
-      convertedObj[key] = prop[0];
-    } else if (typeof prop === "object") {
-      const convertedProp = traverseErrorMessagesTree(prop);
+      if (field instanceof Array) {
+        parsed[key] = parseArray(field);
+      } else if (typeof field === "object") {
+        parsed[key] = parseObject(field);
+      }
+    });
 
-      convertedObj[key] = convertedProp;
+    return parsed;
+  };
 
-      return convertedObj;
+  const parseArray = (
+    current: Array<string | AnyErrorMessagesTree>
+  ): string | undefined => {
+    let hasObject = false;
+
+    for (const field of current) {
+      hasObject = typeof field === "object";
     }
-  }
 
-  return convertedObj;
+    if (hasObject) {
+      return undefined;
+    } else {
+      return current[0] as string;
+    }
+  };
+
+  return parseObject(formErrorMessagesTree);
 }
 
 export function formikResolver<S extends FormikFormSchema>(schema: S) {
@@ -35,7 +57,9 @@ export function formikResolver<S extends FormikFormSchema>(schema: S) {
       if (result.messagesTree instanceof Array) {
         return undefined;
       } else {
-        return traverseErrorMessagesTree<InferType<S>>(result.messagesTree);
+        return traverseErrorMessagesTree(result.messagesTree) as FormikErrors<
+          InferType<S>
+        >;
       }
     } else {
       return undefined;
