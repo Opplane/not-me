@@ -3,7 +3,7 @@ import { ValidationResult } from "../schema";
 import { objectOf } from "./object-of-schema";
 
 describe("Object Of Schema", () => {
-  const schema = objectOf([equals(["a"] as const).defined()]).defined();
+  const schema = objectOf(equals(["a"] as const).defined()).defined();
 
   it("valid", () => {
     const result: ValidationResult<{ [key: string]: "a" }> = schema.validate({

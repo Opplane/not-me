@@ -4,11 +4,11 @@ import { InferType, Schema } from "../schema";
 import { array } from "./array-schema";
 
 describe("Array Schema", () => {
-  const objSchema: Schema<{ [key: string]: "a" | "b" } | undefined> = objectOf([
-    equals(["a"] as const).defined(),
-  ]);
+  const objSchema: Schema<{ [key: string]: "a" | "b" } | undefined> = objectOf(
+    equals(["a", "b"] as const).defined()
+  );
 
-  const arraySchema = array([objSchema]);
+  const arraySchema = array(objSchema);
 
   const schema: Schema<
     Array<InferType<typeof objSchema>> | undefined
@@ -37,7 +37,7 @@ describe("Array Schema", () => {
     expect(schema.validate([undefined, undefined, { someProp: "c" }])).toEqual({
       errors: true,
       messagesTree: {
-        2: [{ someProp: ["Input is not equal to any of the allowed values"] }],
+        2: { someProp: ["Input is not equal to any of the allowed values"] },
       },
     });
   });

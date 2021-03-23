@@ -54,16 +54,16 @@ Keeping an app's code splitted into small lazy-loaded chunks is a priority in fr
 
 This library offers the following basic types for you to build more complex validation schemas:
 
-- `array([...allowed elements schemas])`
+- `array()`
 - `base()` - all schemas extend from this one. It accepts a broad base type (like `object`) and a more precise shape type (like `{ a: number }`) as generics
 - `boolean()`
 - `date()`
 - `equals([...allowed values])`
 - `number()`
 - `object({ property: schemaForTheProperty })`
-- `objectOf([...allowed values schemas])` - same as `object()` but for objects whose keys can be any string
+- `objectOf()` - same as `object()` but for objects whose keys can be any string
 - `string()`
-- `or()` - the value is filtered by multiple schemas till one matches. It's the equivalent to an _union type_
+- `or([...schemas])` - the value is filtered by multiple schemas till one matches. It's the equivalent to an _union type_
 
 With these basic blocks, you can build more complex validations, by chaining...
 
