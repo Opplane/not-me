@@ -3,19 +3,19 @@ import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
 import { InferType, Schema } from "../schema";
 
-type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
+type ElementsSchemaBase = Schema<unknown>;
 type BaseType = unknown[];
 
 export class ArraySchema<
-  ValuesSchemas extends ValuesSchemasBase
-> extends BaseSchema<BaseType, InferType<ValuesSchemas[number]>[]> {
+  ElementsSchema extends ElementsSchemaBase
+> extends BaseSchema<BaseType, InferType<ElementsSchema>[]> {
   private minLength = 0;
   private minLengthMessage?: string;
 
   private maxLength = Infinity;
   private maxLengthMessage?: string;
 
-  constructor(valuesSchemas: ValuesSchemas, message?: string) {
+  constructor(elementsSchema: ElementsSchema, message?: string) {
     super((input) => {
       if (input instanceof Array) {
         return {
@@ -34,10 +34,6 @@ export class ArraySchema<
         };
       }
     });
-
-    if (valuesSchemas.length === 0) {
-      throw new Error("No schemas were provided");
-    }
 
     this.addShapeFilter((input, options) => {
       const errors: { [key: number]: AnyErrorMessagesTree } = {};
@@ -69,36 +65,21 @@ export class ArraySchema<
       for (let index = 0; index < input.length; index++) {
         const element = input[index];
 
-        let acceptedResultValue: unknown;
-        let isValid = false;
-        const errorsFromSchemaIteration: AnyErrorMessagesTree = [];
+        const result = elementsSchema.validate(element, options);
 
-        for (const schema of valuesSchemas) {
-          const result = schema.validate(element, options);
-
-          if (result.errors) {
-            errorsFromSchemaIteration.push(result.messagesTree);
-            continue;
-          } else {
-            acceptedResultValue = result.value;
-            isValid = true;
-            break;
-          }
-        }
-
-        if (isValid) {
-          validatedArray.push(acceptedResultValue);
-        } else {
+        if (result.errors) {
           if (options?.abortEarly) {
             return {
               errors: true,
               messagesTree: {
-                [index]: errorsFromSchemaIteration,
+                [index]: result.messagesTree,
               },
             };
           } else {
-            errors[index] = errorsFromSchemaIteration;
+            errors[index] = result.messagesTree;
           }
+        } else {
+          validatedArray.push(result.value);
         }
       }
 
@@ -131,9 +112,9 @@ export class ArraySchema<
   }
 }
 
-export function array<ValuesSchemas extends ValuesSchemasBase>(
-  valuesSchemas: ValuesSchemas,
+export function array<ElementsSchema extends ElementsSchemaBase>(
+  elementsSchema: ElementsSchema,
   message?: string
-): ArraySchema<ValuesSchemas> {
-  return new ArraySchema<ValuesSchemas>(valuesSchemas, message);
+): ArraySchema<ElementsSchema> {
+  return new ArraySchema<ElementsSchema>(elementsSchema, message);
 }

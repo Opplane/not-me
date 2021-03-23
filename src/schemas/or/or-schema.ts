@@ -10,7 +10,7 @@ export class OrSchema<
 > extends BaseSchema<Exclude<InferType<ValuesSchemas[number]>, NullableTypes>> {
   constructor(valuesSchemas: ValuesSchemas) {
     if (valuesSchemas.length === 0) {
-      throw new Error("No schemas were provided");
+      throw new Error("No schemas provided");
     }
 
     super((input, options) => {

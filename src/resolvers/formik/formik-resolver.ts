@@ -4,10 +4,10 @@ import { InferType, Schema } from "../../schemas/schema";
 
 type FormikFormSchema = Schema<{ [key: string]: unknown }>;
 
-type TraversedFormErrors = string | TraversedFormErrorsObject;
+type TraversedFormErrors = string | undefined | TraversedFormErrorsObject;
 
 type TraversedFormErrorsObject = {
-  [key: string]: TraversedFormErrors | undefined;
+  [key: string]: TraversedFormErrors;
 };
 
 function traverseErrorMessagesTree(formErrorMessagesTree: {
@@ -32,17 +32,19 @@ function traverseErrorMessagesTree(formErrorMessagesTree: {
 
   const parseArray = (
     current: Array<string | AnyErrorMessagesTree>
-  ): string | undefined => {
-    let hasObject = false;
+  ): TraversedFormErrors => {
+    if (current.length === 1) {
+      const firstElement = current[0];
 
-    for (const field of current) {
-      hasObject = typeof field === "object";
-    }
-
-    if (hasObject) {
-      return undefined;
+      if (firstElement instanceof Array) {
+        return parseArray(firstElement);
+      } else if (typeof firstElement === "object") {
+        return parseObject(firstElement);
+      } else {
+        return firstElement;
+      }
     } else {
-      return current[0] as string;
+      return undefined;
     }
   };
 

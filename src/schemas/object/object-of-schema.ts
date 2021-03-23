@@ -1,22 +1,14 @@
-import { DefaultErrorMessagesManager } from "../../error-messages/default-messages/default-error-messages-manager";
 import { AnyErrorMessagesTree } from "../../error-messages/error-messages-tree";
 import { BaseSchema } from "../base/base-schema";
-import { ValidationResult, InferType, Schema } from "../schema";
+import { InferType, Schema } from "../schema";
 import { BaseType, objectTypeFilter } from "./object-type-filter";
 
-type ValuesSchemasBase = [Schema<unknown>, ...Array<Schema<unknown>>];
+type FieldsSchemaBase = Schema<unknown>;
 
 export class ObjectOfSchema<
-  ValuesSchemas extends ValuesSchemasBase
-> extends BaseSchema<
-  BaseType,
-  { [key: string]: InferType<ValuesSchemas[number]> }
-> {
-  constructor(
-    valuesSchemas: ValuesSchemas,
-    message?: string,
-    fieldDoesNotMatchMessage?: string
-  ) {
+  FieldsSchema extends FieldsSchemaBase
+> extends BaseSchema<BaseType, { [key: string]: InferType<FieldsSchema> }> {
+  constructor(fieldsSchema: FieldsSchema, message?: string) {
     super((input) => objectTypeFilter(input, message));
 
     this.addShapeFilter((input, options) => {
@@ -26,44 +18,21 @@ export class ObjectOfSchema<
       for (const fieldKey in input) {
         const fieldValue = input[fieldKey];
 
-        let lastFieldResult: ValidationResult<unknown> | undefined = undefined;
+        const result = fieldsSchema.validate(fieldValue, options);
 
-        for (const schema of valuesSchemas) {
-          const result = schema.validate(fieldValue, options);
-          lastFieldResult = result;
-
-          if (!result.errors) {
-            break;
-          }
-        }
-
-        if (!lastFieldResult) {
-          throw new Error("No schemas were provided");
-        }
-
-        if (lastFieldResult.errors) {
-          const messages =
-            valuesSchemas.length === 1
-              ? lastFieldResult.messagesTree
-              : [
-                  fieldDoesNotMatchMessage ||
-                    DefaultErrorMessagesManager.getDefaultMessages()?.objectOf
-                      ?.fieldDoesNotMatch ||
-                    "Field did not match any of the provided schemas",
-                ];
-
+        if (result.errors) {
           if (options?.abortEarly) {
             return {
               errors: true,
               messagesTree: {
-                [fieldKey]: messages,
+                [fieldKey]: result.messagesTree,
               },
             };
           } else {
-            errors[fieldKey] = messages;
+            errors[fieldKey] = result.messagesTree;
           }
         } else {
-          finalValue[fieldKey] = lastFieldResult.value;
+          finalValue[fieldKey] = result.value;
         }
       }
 
@@ -82,14 +51,9 @@ export class ObjectOfSchema<
   }
 }
 
-export function objectOf<ValuesSchemas extends ValuesSchemasBase>(
-  valuesSchemas: ValuesSchemas,
-  message?: string,
-  fieldDoesNotMatchMessage?: string
-): ObjectOfSchema<ValuesSchemas> {
-  return new ObjectOfSchema<ValuesSchemas>(
-    valuesSchemas,
-    message,
-    fieldDoesNotMatchMessage
-  );
+export function objectOf<FieldsSchema extends FieldsSchemaBase>(
+  fieldsSchema: FieldsSchema,
+  message?: string
+): ObjectOfSchema<FieldsSchema> {
+  return new ObjectOfSchema<FieldsSchema>(fieldsSchema, message);
 }
