@@ -16,7 +16,7 @@ export class EqualsSchema<
           errors: true,
           messagesTree: [
             message ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.equals
+              DefaultErrorMessagesManager.getDefaultMessages().equals
                 ?.notEqual ||
               "Input is not equal to any of the allowed values",
           ],

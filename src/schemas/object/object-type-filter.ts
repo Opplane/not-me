@@ -12,7 +12,7 @@ export function objectTypeFilter(
       errors: true,
       messagesTree: [
         message ||
-          DefaultErrorMessagesManager.getDefaultMessages()?.object
+          DefaultErrorMessagesManager.getDefaultMessages().object
             ?.notAnObject ||
           "Input is not an object",
       ],

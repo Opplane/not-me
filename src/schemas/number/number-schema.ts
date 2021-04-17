@@ -6,8 +6,7 @@ export class NumberSchema extends BaseSchema<number> {
     super((input) => {
       const typeErrorMessage = [
         message ||
-          DefaultErrorMessagesManager.getDefaultMessages()?.number
-            ?.notANumber ||
+          DefaultErrorMessagesManager.getDefaultMessages().number?.notANumber ||
           "Input is not a number",
       ];
 
@@ -39,8 +38,7 @@ export class NumberSchema extends BaseSchema<number> {
       (input) => Number.isInteger(input),
       () =>
         message ||
-        DefaultErrorMessagesManager.getDefaultMessages()?.number
-          ?.isNotInteger ||
+        DefaultErrorMessagesManager.getDefaultMessages().number?.isNotInteger ||
         "Input is not an integer"
     );
 

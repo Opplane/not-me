@@ -18,7 +18,7 @@ export class StringSchema<
       } else {
         const typeErrorMessage = [
           message ||
-            DefaultErrorMessagesManager.getDefaultMessages()?.string
+            DefaultErrorMessagesManager.getDefaultMessages().string
               ?.notAString ||
             "Input is not a string",
         ];
@@ -45,7 +45,7 @@ export class StringSchema<
       },
       () =>
         message ||
-        DefaultErrorMessagesManager.getDefaultMessages()?.string?.notAString ||
+        DefaultErrorMessagesManager.getDefaultMessages().string?.notAString ||
         "Field must be filled"
     );
 

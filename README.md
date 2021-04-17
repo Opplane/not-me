@@ -48,7 +48,7 @@ npm install @opplane/not-me
 
 > Most IDEs and Javascript text editors (like _Visual Studio Code_) import modules automatically just by starting to write the name of the value you want to use.
 
-Keeping an app's code splitted into small lazy-loaded chunks is a priority in frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from 'not-me/lib/schemas/object/object-schema`
+Keeping an app's code splitted into small lazy-loaded chunks is a priority in frontend development. Since legacy systems and some bundlers, like React Native's _Metro_, do not have tree-shaking, this package does not provide a single `index.js` import with all the code bundled in it. Instead, you are encouraged to import what you need from within the directories the package has. For example, the schemas are inside the `lib/schemas` directory, so if you want to import a schema for an object type, you need to import it like this `import { object } from '@opplane/not-me/lib/schemas/object/object-schema`
 
 ### Building schemas:
 
@@ -59,6 +59,7 @@ This library offers the following basic types for you to build more complex vali
 - `boolean()`
 - `date()`
 - `equals([...allowed values])`
+  - use `as const` for when you want the types to be the exact value literals. Example: `equals([2, 'hello'])` validated value will be typed as `number | string` but `equals([2, 'hello'] as const)` validated value will be typed as `2 | 'hello'`
 - `number()`
 - `object({ property: schemaForTheProperty })`
 - `objectOf()` - same as `object()` but for objects whose keys can be any string
@@ -72,7 +73,7 @@ With these basic blocks, you can build more complex validations, by chaining...
 - `defined()` - sets the schema to reject `undefined` values
 - `nullable()` - sets the schema to accept `null` values
 
-All these methods except `transform` have a last parameter that allows you to set a customized error message for when the value fails to meet the conditions. The methods above are all inherited from the `base()` schema. Other schemas might provide their own helpful methods, like `string()` provides `string().filled()`, a method that makes sure the field is filled not just with blank spaces.
+The methods above are all inherited from the `base()` schema. Other schemas might provide their own helpful methods, like `string()` provides `string().filled()`, a method that makes sure the field is filled not just with blank spaces.
 
 Typescript will guide you in the recommended order by which you should chain validations. But if you use pure Javascript, we recommend you to chain schemas in this order:
 
@@ -82,6 +83,12 @@ Typescript will guide you in the recommended order by which you should chain val
 - Test and Transform validations (`test()` and `transform()`)
 
 If you follow what auto-complete presents to you, you should be fine.
+
+### Error messages:
+
+Most of these schemas and their methods (except `transform`) have a last parameter that allows you to set a customized error message for when the value fails to meet the conditions.
+
+You can also customize the default error messages by using the `DefaultErrorMessagesManager` in `error-messages/default-messages/default-error-messages-manager`.
 
 ### Union typed schemas:
 
@@ -113,7 +120,7 @@ const schema = object({
   .defined();
 ```
 
-### Type utilities (at `not-me/lib/schemas/schema`):
+### Type utilities (at `@opplane/not-me/lib/schemas/schema`):
 
 - **`InferType<typeof schema>`**: get the output type of a schema
 - **`Schema<T>`**: dictates that a value is a schema that has an output type of `T`
@@ -125,7 +132,7 @@ Just extend the class of the closest schema there is for your type of value, and
 - Here's how an Integer Schema could be implemented:
 
 ```typescript
-import { NumberSchema } from "not-me/lib/schemas/number/number-schema";
+import { NumberSchema } from "@opplane/not-me/lib/schemas/number/number-schema";
 
 class IntegerSchema extends NumberSchema {
   constructor(message?: string) {
@@ -157,7 +164,7 @@ This package includes validation resolvers to work with the following libraries 
 #### <a name="formik"></a> Formik
 
 ```tsx
-import { formikResolver } from "not-me/lib/resolvers/formik/formik-resolver";
+import { formikResolver } from "@opplane/not-me/lib/resolvers/formik/formik-resolver";
 
 // (...)
 
@@ -175,7 +182,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
   ```typescript
   import { Module, OnApplicationShutdown } from "@nestjs/common";
   import { APP_PIPE } from "@nestjs/core";
-  import { NotMeValidationPipe } from "not-me/lib/resolvers/nest/validation.pipe";
+  import { NotMeValidationPipe } from "@opplane/not-me/lib/resolvers/nest/validation.pipe";
 
   @Module({
     providers: [
@@ -197,10 +204,10 @@ By integrating this resolver with your NestJS project, arguments annotated with 
     > **(RECOMMENDED) The schema is allowed to have more properties** than the class. This method guarantees that all values specified in the class are present the final validated object. When using this method, **the class should be the first place you go to add, change or remove properties**.
 
     ```typescript
-    import { object } from "not-me/lib/schemas/object/object-schema";
-    import { string } from "not-me/lib/schemas/string/string-schema";
-    import { Schema } from "not-me/lib/schemas/schema";
-    import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+    import { object } from "@opplane/not-me/lib/schemas/object/object-schema";
+    import { string } from "@opplane/not-me/lib/schemas/string/string-schema";
+    import { Schema } from "@opplane/not-me/lib/schemas/schema";
+    import { ValidationSchema } from "@opplane/not-me/lib/resolvers/nest/validation-schema.decorator";
 
     const schema: Schema<AnyDataDTO> = object({
       field: string().required(),
@@ -217,10 +224,10 @@ By integrating this resolver with your NestJS project, arguments annotated with 
     > Some use cases might require **the class to have more properties** than the schema. In those cases, we recommend **implementing the schema's inferred type**. When using this method, **the schema should be the first place you go to add, change or remove properties**.
 
     ```typescript
-    import { object } from "not-me/lib/schemas/object/object-schema";
-    import { string } from "not-me/lib/schemas/string/string-schema";
-    import { InferType } from "not-me/lib/schemas/schema";
-    import { ValidationSchema } from "not-me/lib/resolvers/nest/validation-schema.decorator";
+    import { object } from "@opplane/not-me/lib/schemas/object/object-schema";
+    import { string } from "@opplane/not-me/lib/schemas/string/string-schema";
+    import { InferType } from "@opplane/not-me/lib/schemas/schema";
+    import { ValidationSchema } from "@opplane/not-me/lib/resolvers/nest/validation-schema.decorator";
 
     const schema = object({
       field: string().required(),
