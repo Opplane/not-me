@@ -211,7 +211,7 @@ export abstract class BaseSchema<
     } as AcceptedValueValidationResult<InferType<this>>;
   }
 
-  messageWhenNullIsRejected(message: string): this {
+  setMessageForWhenNullIsRejected(message: string): this {
     this.nullNotAllowedMessage = message;
     return this;
   }
