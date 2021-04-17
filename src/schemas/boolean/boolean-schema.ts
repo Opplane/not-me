@@ -17,7 +17,7 @@ export class BooleanSchema extends BaseSchema<boolean> {
       } else {
         const typeErrorMessage = [
           message ||
-            DefaultErrorMessagesManager.getDefaultMessages()?.boolean
+            DefaultErrorMessagesManager.getDefaultMessages().boolean
               ?.notABoolean ||
             "Input is not a boolean",
         ];

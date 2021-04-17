@@ -27,7 +27,7 @@ export class ArraySchema<
           errors: true,
           messagesTree: [
             message ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.array
+              DefaultErrorMessagesManager.getDefaultMessages().array
                 ?.notAnArray ||
               "Input is not an array",
           ],
@@ -45,7 +45,7 @@ export class ArraySchema<
           errors: true,
           messagesTree: [
             this.minLengthMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.array
+              DefaultErrorMessagesManager.getDefaultMessages().array
                 ?.lessThanMinimum ||
               "Array has less elements than expected",
           ],
@@ -55,7 +55,7 @@ export class ArraySchema<
           errors: true,
           messagesTree: [
             this.maxLengthMessage ||
-              DefaultErrorMessagesManager.getDefaultMessages()?.array
+              DefaultErrorMessagesManager.getDefaultMessages().array
                 ?.moreThanMaximum ||
               "Array has more elements than expected",
           ],

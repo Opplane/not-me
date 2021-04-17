@@ -6,13 +6,13 @@ export class DateSchema extends BaseSchema<Date> {
     super((input) => {
       const notADateMessages = [
         message ||
-          DefaultErrorMessagesManager.getDefaultMessages()?.date?.notADate ||
+          DefaultErrorMessagesManager.getDefaultMessages().date?.notADate ||
           "Input is not a date",
       ];
 
       const invalidDateMessages = [
         message ||
-          DefaultErrorMessagesManager.getDefaultMessages()?.date?.invalidDate ||
+          DefaultErrorMessagesManager.getDefaultMessages().date?.invalidDate ||
           "Input is not a valid date",
       ];
 

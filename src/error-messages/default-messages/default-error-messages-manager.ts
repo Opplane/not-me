@@ -1,18 +1,18 @@
 import { DefaultErrorMessages } from "./default-error-messages-types";
 
 class DefaultErrorMessagesManagerImpl {
-  private defaultMessages?: DefaultErrorMessages;
+  private defaultMessages: DefaultErrorMessages;
+
+  constructor() {
+    this.defaultMessages = {};
+  }
 
   setDefaultMessages(defaultMessages: DefaultErrorMessages): void {
     this.defaultMessages = defaultMessages;
   }
 
-  getDefaultMessages(): DefaultErrorMessages | undefined {
+  getDefaultMessages(): DefaultErrorMessages {
     return this.defaultMessages;
-  }
-
-  resetDefaultMessages(): void {
-    this.defaultMessages = undefined;
   }
 }
 
