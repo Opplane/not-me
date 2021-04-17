@@ -88,12 +88,8 @@ export class ObjectSchema<
     ) => { [key: string]: Schema<unknown> | undefined }
   >(
     schemaFactory: SchemaFactory
-  ): BaseSchema<
-    BaseType,
-    SchemaObjToShape<
-      Omit<SchemaObj, keyof ReturnType<SchemaFactory>> &
-        ReturnType<SchemaFactory>
-    >
+  ): ObjectSchema<
+    Omit<SchemaObj, keyof ReturnType<SchemaFactory>> & ReturnType<SchemaFactory>
   > {
     this.addShapeFilter((input, options) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
