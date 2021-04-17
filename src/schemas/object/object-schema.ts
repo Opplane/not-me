@@ -106,10 +106,7 @@ export class ObjectSchema<
       } else {
         return {
           errors: false,
-          value: {
-            ...input,
-            ...result.value,
-          },
+          value: result.value,
         };
       }
     });
