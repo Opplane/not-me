@@ -15,6 +15,8 @@ export class ArraySchema<
   private maxLength = Infinity;
   private maxLengthMessage?: string;
 
+  private willWrapIfNotAnArray = false;
+
   constructor(elementsSchema: ElementsSchema, message?: string) {
     super((input) => {
       if (input instanceof Array) {
@@ -23,15 +25,22 @@ export class ArraySchema<
           value: input,
         };
       } else {
-        return {
-          errors: true,
-          messagesTree: [
-            message ||
-              DefaultErrorMessagesManager.getDefaultMessages().array
-                ?.notAnArray ||
-              "Input is not an array",
-          ],
-        };
+        if (this.willWrapIfNotAnArray) {
+          return {
+            errors: false,
+            value: [input],
+          };
+        } else {
+          return {
+            errors: true,
+            messagesTree: [
+              message ||
+                DefaultErrorMessagesManager.getDefaultMessages().array
+                  ?.notAnArray ||
+                "Input is not an array",
+            ],
+          };
+        }
       }
     });
 
@@ -95,6 +104,12 @@ export class ArraySchema<
         };
       }
     });
+  }
+
+  wrapIfNotAnArray(): this {
+    this.willWrapIfNotAnArray = true;
+
+    return this;
   }
 
   min(length: number, message?: string): this {
