@@ -175,7 +175,7 @@ import { formikResolver } from "@opplane/not-me/lib/resolvers/formik/formik-reso
 
 #### <a name="nest"></a> Nest
 
-By integrating this resolver with your NestJS project, arguments annotated with `@Param`, `@Query` and `@Body` will need to be typed as **ES6 classes** annotated with `@ValidationSchema`, in order to get the validation schema throught reflection.
+By integrating this resolver with your NestJS project, parameters annotated with `@Param`, `@Query` and `@Body` will be validated by `not-me`. The parameters need to be typed as **ES6 classes** and annotated with the `@ValidationSchema` decorator, in order to get the validation schema working throught reflection.
 
 - `app.ts`
 
