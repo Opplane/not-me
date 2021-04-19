@@ -210,7 +210,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
     import { ValidationSchema } from "@opplane/not-me/lib/resolvers/nest/validation-schema.decorator";
 
     const schema: Schema<AnyDataDTO> = object({
-      field: string().required(),
+      field: string().defined(),
     });
 
     @ValidationSchema(schema)
@@ -230,7 +230,7 @@ By integrating this resolver with your NestJS project, arguments annotated with 
     import { ValidationSchema } from "@opplane/not-me/lib/resolvers/nest/validation-schema.decorator";
 
     const schema = object({
-      field: string().required(),
+      field: string().defined(),
     });
 
     @ValidationSchema(schema)
