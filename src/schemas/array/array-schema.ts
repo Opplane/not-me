@@ -26,10 +26,17 @@ export class ArraySchema<
         };
       } else {
         if (this.willWrapIfNotAnArray) {
-          return {
-            errors: false,
-            value: [input],
-          };
+          if (input === undefined) {
+            return {
+              errors: false,
+              value: [],
+            };
+          } else {
+            return {
+              errors: false,
+              value: [input],
+            };
+          }
         } else {
           return {
             errors: true,
@@ -106,10 +113,18 @@ export class ArraySchema<
     });
   }
 
-  wrapIfNotAnArray(): this {
+  wrapIfNotAnArray(): BaseSchema<
+    BaseType,
+    InferType<ElementsSchema>[],
+    Exclude<this["_nullableTypes"], undefined>
+  > {
     this.willWrapIfNotAnArray = true;
 
-    return this;
+    this.allowUndefined = true;
+    this.allowUndefinedInBaseTypeFilter = true;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
+    return this as any;
   }
 
   min(length: number, message?: string): this {

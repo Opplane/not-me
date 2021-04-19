@@ -1,6 +1,7 @@
 import { equals } from "../equals/equals-schema";
 import { objectOf } from "../object/object-of-schema";
 import { InferType, Schema } from "../schema";
+import { string } from "../string/string-schema";
 import { array } from "./array-schema";
 
 describe("Array Schema", () => {
@@ -55,6 +56,45 @@ describe("Array Schema", () => {
     expect(arraySchema.min(1).validate([])).toEqual({
       errors: true,
       messagesTree: ["Array has less elements than expected"],
+    });
+  });
+
+  it("Should transform undefined into empty array", () => {
+    const schema: Schema<string[]> = array(
+      string().defined()
+    ).wrapIfNotAnArray();
+
+    const result = schema.validate(undefined);
+
+    expect(result).toEqual({
+      errors: false,
+      value: [],
+    });
+  });
+
+  it("Should wrap string value in an array", () => {
+    const schema: Schema<string[]> = array(
+      string().defined()
+    ).wrapIfNotAnArray();
+
+    const result = schema.validate("hello");
+
+    expect(result).toEqual({
+      errors: false,
+      value: ["hello"],
+    });
+  });
+
+  it("Should not wrap null in an array", () => {
+    const schema: Schema<string[]> = array(
+      string().defined()
+    ).wrapIfNotAnArray();
+
+    const result = schema.validate(null);
+
+    expect(result).toEqual({
+      errors: true,
+      messagesTree: [expect.any(String) as unknown],
     });
   });
 });
