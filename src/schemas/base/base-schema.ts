@@ -44,16 +44,13 @@ type TransformFilter<V, R> = {
   filterFn: (value: V) => R;
 };
 
-function isNullable(input: unknown): input is undefined | null {
-  return input === undefined || input === null;
-}
-
 export abstract class BaseSchema<
   BaseType,
   Shape extends BaseType = BaseType,
   NT extends NullableTypes = DefaultNullableTypes
 > implements Schema<Shape | NT> {
   _outputType!: Shape | NT;
+  _nullableTypes!: NT;
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
@@ -64,8 +61,9 @@ export abstract class BaseSchema<
   private allowNull = false;
   private nullNotAllowedMessage?: string;
 
-  private allowUndefined = true;
+  protected allowUndefined = true;
   private undefinedNotAllowedMessage?: string;
+  protected allowUndefinedInBaseTypeFilter = false;
 
   protected mapMode?: boolean;
 
@@ -105,23 +103,34 @@ export abstract class BaseSchema<
       } as RejectedValueValidationResult;
     }
 
-    if (!isNullable(_currentValue)) {
+    const notNullable = _currentValue != null;
+
+    /*
+      Exclude undefined and null, by using the non-strict equality operator '=='
+      or allow undefined if base filter if that what's expected from the schema
+    */
+    if (
+      notNullable ||
+      (_currentValue === undefined && this.allowUndefinedInBaseTypeFilter)
+    ) {
       /*
       BASE TYPE FILTER
     */
-      let typedValue = _currentValue;
 
       const typeFilterResponse = this.baseTypeFilter.filterFn(
-        typedValue,
+        _currentValue,
         options
       );
 
       if (typeFilterResponse.errors) {
         return typeFilterResponse;
       } else {
-        typedValue = typeFilterResponse.value;
+        _currentValue = typeFilterResponse.value;
       }
+    }
 
+    // Exclude undefined and null, by using the non-strict equality operator '=='
+    if (notNullable) {
       /*
       SHAPE FILTERS
     */
@@ -130,7 +139,7 @@ export abstract class BaseSchema<
 
       if (this.mapMode) {
         shapedValue = {} as BaseType;
-        let shapedValueWithUnknownProperties = typedValue as BaseType;
+        let shapedValueWithUnknownProperties = _currentValue as BaseType;
 
         for (let i = 0; i < this.shapeFilters.length; i++) {
           const shapeFilter = this.shapeFilters[i] || throwError();
@@ -151,7 +160,7 @@ export abstract class BaseSchema<
           }
         }
       } else {
-        shapedValue = typedValue as BaseType;
+        shapedValue = _currentValue as BaseType;
 
         for (let i = 0; i < this.shapeFilters.length; i++) {
           const shapeFilter = this.shapeFilters[i] || throwError();
