@@ -61,7 +61,7 @@ export abstract class BaseSchema<
   private allowNull = false;
   private nullNotAllowedMessage?: string;
 
-  protected allowUndefined = true;
+  private allowUndefined = true;
   private undefinedNotAllowedMessage?: string;
   protected allowUndefinedInBaseTypeFilter = false;
 
@@ -103,12 +103,9 @@ export abstract class BaseSchema<
       } as RejectedValueValidationResult;
     }
 
+    // Use loose equality operator '!=' to exclude null and undefined
     const notNullable = _currentValue != null;
 
-    /*
-      Exclude undefined and null, by using the non-strict equality operator '=='
-      or allow undefined if base filter if that what's expected from the schema
-    */
     if (
       notNullable ||
       (_currentValue === undefined && this.allowUndefinedInBaseTypeFilter)
@@ -129,7 +126,6 @@ export abstract class BaseSchema<
       }
     }
 
-    // Exclude undefined and null, by using the non-strict equality operator '=='
     if (notNullable) {
       /*
       SHAPE FILTERS
@@ -227,14 +223,19 @@ export abstract class BaseSchema<
 
   nullable(): BaseSchema<BaseType, Shape, NT | null> {
     this.allowNull = true;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
   defined(
     message?: string
   ): BaseSchema<BaseType, Shape, Exclude<NT, undefined>> {
-    this.allowUndefined = false;
+    if (!this.allowUndefinedInBaseTypeFilter) {
+      this.allowUndefined = false;
+    }
+
     this.undefinedNotAllowedMessage = message;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
   }
