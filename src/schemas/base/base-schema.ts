@@ -52,7 +52,11 @@ export abstract class BaseSchema<
   _outputType!: Shape | NT;
   _nullableTypes!: NT;
 
-  protected wrapValueBeforeValidation?: (input: unknown) => unknown;
+  protected wrapValueBeforeValidation?: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this: BaseSchema<any, any, any>,
+    input: unknown
+  ) => unknown;
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
@@ -60,10 +64,10 @@ export abstract class BaseSchema<
     TestFilter<InferType<this>> | TransformFilter<InferType<this>, unknown>
   > = [];
 
-  private allowNull = false;
+  protected allowNull = false;
   private nullNotAllowedMessage?: string;
 
-  private allowUndefined = true;
+  protected allowUndefined = true;
   private undefinedNotAllowedMessage?: string;
 
   protected mapMode?: boolean;
