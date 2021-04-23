@@ -172,6 +172,8 @@ import { formikResolver } from "@opplane/not-me/lib/resolvers/formik/formik-reso
 </Formik>;
 ```
 
+If you plan on doing a custom `validate` function, `@opplane/not-me/lib/resolvers/formik/formik-resolver` also exports `messagesTreeToFormikErrors`, which transforms _Not-Me_ error message trees into _Formik_ errors.
+
 #### <a name="nest"></a> Nest
 
 By integrating this resolver with your NestJS project, parameters annotated with `@Param`, `@Query` and `@Body` will be validated by `not-me`. The parameters need to be typed as **ES6 classes** and annotated with the `@ValidationSchema` decorator, in order to get the validation schema working throught reflection.

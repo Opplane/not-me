@@ -60,9 +60,9 @@ describe("Array Schema", () => {
   });
 
   it("Should transform undefined into empty array", () => {
-    const schema: Schema<string[]> = array(
-      string().defined()
-    ).wrapIfNotAnArray();
+    const schema: Schema<string[]> = array(string().defined())
+      .wrapIfNotAnArray()
+      .defined();
 
     const result = schema.validate(undefined);
 
@@ -73,9 +73,9 @@ describe("Array Schema", () => {
   });
 
   it("Should wrap string value in an array", () => {
-    const schema: Schema<string[]> = array(
-      string().defined()
-    ).wrapIfNotAnArray();
+    const schema: Schema<string[]> = array(string().defined())
+      .wrapIfNotAnArray()
+      .defined();
 
     const result = schema.validate("hello");
 
@@ -85,16 +85,18 @@ describe("Array Schema", () => {
     });
   });
 
-  it("Should not wrap null in an array", () => {
-    const schema: Schema<string[]> = array(
-      string().defined()
-    ).wrapIfNotAnArray();
+  it("Should wrap null in an array", () => {
+    const schema: Schema<null[]> = array(equals([null]).defined())
+      .wrapIfNotAnArray()
+      .defined();
 
     const result = schema.validate(null);
 
     expect(result).toEqual({
       errors: true,
-      messagesTree: [expect.any(String) as unknown],
+      messagesTree: {
+        "0": [expect.any(String) as unknown],
+      },
     });
   });
 });

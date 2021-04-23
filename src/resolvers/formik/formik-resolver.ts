@@ -10,7 +10,7 @@ type TraversedFormErrorsObject = {
   [key: string]: TraversedFormErrors;
 };
 
-function traverseErrorMessagesTree(formErrorMessagesTree: {
+export function messagesTreeToFormikErrors(formErrorMessagesTree: {
   [key: string]: AnyErrorMessagesTree;
 }): TraversedFormErrorsObject {
   const parseObject = (current: { [key: string]: AnyErrorMessagesTree }) => {
@@ -59,7 +59,7 @@ export function formikResolver<S extends FormikFormSchema>(schema: S) {
       if (result.messagesTree instanceof Array) {
         return undefined;
       } else {
-        return traverseErrorMessagesTree(result.messagesTree) as FormikErrors<
+        return messagesTreeToFormikErrors(result.messagesTree) as FormikErrors<
           InferType<S>
         >;
       }

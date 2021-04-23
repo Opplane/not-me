@@ -52,18 +52,23 @@ export abstract class BaseSchema<
   _outputType!: Shape | NT;
   _nullableTypes!: NT;
 
+  protected wrapValueBeforeValidation?: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this: BaseSchema<any, any, any>,
+    input: unknown
+  ) => unknown;
+
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
   private otherFilters: Array<
     TestFilter<InferType<this>> | TransformFilter<InferType<this>, unknown>
   > = [];
 
-  private allowNull = false;
+  protected allowNull = false;
   private nullNotAllowedMessage?: string;
 
-  private allowUndefined = true;
+  protected allowUndefined = true;
   private undefinedNotAllowedMessage?: string;
-  protected allowUndefinedInBaseTypeFilter = false;
 
   protected mapMode?: boolean;
 
@@ -79,6 +84,10 @@ export abstract class BaseSchema<
     options: ValidationOptions = undefined
   ): ValidationResult<InferType<this>> {
     let _currentValue = input;
+
+    if (this.wrapValueBeforeValidation) {
+      _currentValue = this.wrapValueBeforeValidation(_currentValue);
+    }
 
     if (_currentValue === undefined && !this.allowUndefined) {
       return {
@@ -104,15 +113,10 @@ export abstract class BaseSchema<
     }
 
     // Use loose equality operator '!=' to exclude null and undefined
-    const notNullable = _currentValue != null;
-
-    if (
-      notNullable ||
-      (_currentValue === undefined && this.allowUndefinedInBaseTypeFilter)
-    ) {
+    if (_currentValue != null) {
       /*
-      BASE TYPE FILTER
-    */
+        BASE TYPE FILTER
+      */
 
       const typeFilterResponse = this.baseTypeFilter.filterFn(
         _currentValue,
@@ -124,12 +128,10 @@ export abstract class BaseSchema<
       } else {
         _currentValue = typeFilterResponse.value;
       }
-    }
 
-    if (notNullable) {
       /*
-      SHAPE FILTERS
-    */
+        SHAPE FILTERS
+      */
 
       let shapedValue: BaseType;
 
@@ -230,9 +232,7 @@ export abstract class BaseSchema<
   defined(
     message?: string
   ): BaseSchema<BaseType, Shape, Exclude<NT, undefined>> {
-    if (!this.allowUndefinedInBaseTypeFilter) {
-      this.allowUndefined = false;
-    }
+    this.allowUndefined = false;
 
     this.undefinedNotAllowedMessage = message;
 
