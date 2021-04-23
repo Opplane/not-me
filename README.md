@@ -172,7 +172,7 @@ import { formikResolver } from "@opplane/not-me/lib/resolvers/formik/formik-reso
 </Formik>;
 ```
 
-If you plan on doing a custom `validate` function, `@opplane/not-me/lib/resolvers/formik/formik-resolver` also exports `messagesTreeToFormikErrors` which transforms _Not-Me_ error message trees into _Formik_ errors.
+If you plan on doing a custom `validate` function, `@opplane/not-me/lib/resolvers/formik/formik-resolver` also exports `messagesTreeToFormikErrors`, which transforms _Not-Me_ error message trees into _Formik_ errors.
 
 #### <a name="nest"></a> Nest
 
