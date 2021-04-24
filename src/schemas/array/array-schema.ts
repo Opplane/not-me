@@ -6,24 +6,6 @@ import { InferType, Schema } from "../schema";
 type ElementsSchemaBase = Schema<unknown>;
 type BaseType = unknown[];
 
-function wrapIfNotAnArray(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  this: BaseSchema<any, any, any>,
-  input: unknown
-): undefined | null | unknown[] {
-  if (input instanceof Array) {
-    return input as unknown[];
-  } else {
-    if (input === undefined) {
-      return this.allowUndefined ? input : [];
-    } else if (input === null) {
-      return this.allowNull ? input : [input];
-    } else {
-      return [input];
-    }
-  }
-}
-
 export class ArraySchema<
   ElementsSchema extends ElementsSchemaBase
 > extends BaseSchema<BaseType, InferType<ElementsSchema>[]> {
@@ -116,7 +98,19 @@ export class ArraySchema<
   }
 
   wrapIfNotAnArray(): this {
-    this.wrapValueBeforeValidation = wrapIfNotAnArray;
+    this.wrapValueBeforeValidation = (input): undefined | null | unknown[] => {
+      if (input instanceof Array) {
+        return input as unknown[];
+      } else {
+        if (input === undefined) {
+          return this.allowUndefined ? input : [];
+        } else if (input === null) {
+          return this.allowNull ? input : [input];
+        } else {
+          return [input];
+        }
+      }
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
     return this as any;
