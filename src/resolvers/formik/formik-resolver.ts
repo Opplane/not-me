@@ -33,7 +33,9 @@ export function messagesTreeToFormikErrors(formErrorMessagesTree: {
   const parseArray = (
     current: Array<string | AnyErrorMessagesTree>
   ): TraversedFormErrors => {
-    if (current.length === 1) {
+    if (current.length === 0) {
+      return undefined;
+    } else {
       const firstElement = current[0];
 
       if (firstElement instanceof Array) {
@@ -43,8 +45,6 @@ export function messagesTreeToFormikErrors(formErrorMessagesTree: {
       } else {
         return firstElement;
       }
-    } else {
-      return undefined;
     }
   };
 
