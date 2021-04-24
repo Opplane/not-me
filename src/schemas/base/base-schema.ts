@@ -52,11 +52,7 @@ export abstract class BaseSchema<
   _outputType!: Shape | NT;
   _nullableTypes!: NT;
 
-  protected wrapValueBeforeValidation?: (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this: BaseSchema<any, any, any>,
-    input: unknown
-  ) => unknown;
+  protected wrapValueBeforeValidation?: (input: unknown) => unknown;
 
   private baseTypeFilter: BaseTypeFilter<BaseType>;
   private shapeFilters: ShapeFilter<BaseType>[] = [];
